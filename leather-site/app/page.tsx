@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SITE_CONFIG } from '../../shared/site-config';
+import { SITE_CONFIG } from '@highland/shared/site-config';
 
 export const metadata: Metadata = {
   title: `Leather Store — Coming Soon | ${SITE_CONFIG.companyName}`,

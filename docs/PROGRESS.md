@@ -38,8 +38,39 @@ Client provided credentials in `.env.local` at repo root. URL and both keys conf
 
 ---
 
-## Phase 2 — Main Site Pages (upcoming)
+## Phase 2 — Main Site Pages (Completed 2026-09-14)
 
-Next session will build all six pages of the main corporate website with mock content and the live Supabase contact form.
+### What was built
 
-**Pre-requisite**: Apply `supabase/schema.sql`, `rls.sql`, `seed.sql` to the live Supabase project first.
+- **Full Corporate Website (`main-site`)**:
+  - `Header.tsx`: sticky header with scroll backdrop blur, responsive mobile drawer menu, logo and navigation.
+  - `Footer.tsx`: brand info, navigation, social media icons, copyright, mock disclaimer, and quick business links.
+  - `SocialIcons.tsx`: inline SVG icons for LinkedIn, Twitter, and Instagram (replacing icons removed from recent `lucide-react` releases).
+  - `app/page.tsx` (Home): Hero section with Ethiopian landscape imagery, 3-metric statistics strip, Our Businesses preview cards (Coffee Trading live + Leather store coming soon), Mission teaser quote, and News highlights preview.
+  - `app/about/page.tsx` (About Us): Company overview, Mission/Vision/Values three-card layout, Founding story narrative, and Leadership team cards.
+  - `app/businesses/page.tsx` (Our Businesses): Detailed showcases for both business divisions (Coffee Trading Platform and Leather Goods).
+  - `app/gallery/page.tsx` (Gallery): Curated 12-image grid with category tags, hover overlays, and placeholder flags.
+  - `app/news/page.tsx` (News & Updates): Featured hero post and grid of 3 industry updates/press releases.
+  - `app/contact/page.tsx` & `ContactForm.tsx`: Interactive contact page with contact details sidebar and live React 19 Server Action form.
+  - `app/contact/actions.ts`: Zod schema validation, Supabase insert into `contact_submissions`, and mock notification logged to `notifications` table.
+  - `app/sitemap.ts` & `app/robots.ts`: Automated SEO sitemap and robots.txt generation.
+- **Verification**: `npm run build` exits 0 with all routes generated as static content.
+
+---
+
+## Phase 7 — Leather Store Coming Soon Scaffold (Completed 2026-09-14)
+
+- `leather-site/app/page.tsx`: Branded Coming Soon landing page with clean minimalist design, linking back to `main-site`.
+- Configured `@highland/shared` workspace imports and transpilePackages.
+- Verified build exits 0.
+
+---
+
+## Phase 3–6 — Coffee Business Website & Admin Dashboard (Current)
+
+Next step: Build out the dedicated Coffee Trading Platform (`coffee-site`), covering:
+1. Product catalog browsing & filtering (Phase 3)
+2. Sample request & contract request flows (Phase 4)
+3. Simulated checkout/payment step & admin contract upload (Phase 5)
+4. Staff admin dashboard with metrics, request queues, and catalog management (Phase 6)
+

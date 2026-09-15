@@ -1,0 +1,12 @@
+# robots.txt for www.arzaqtrading.com
+
+User-agent: *
+Allow: /
+
+# Disallow admin and private pages
+Disallow: /admin
+Disallow: /settings
+Disallow: /login
+
+# Sitemap location
+Sitemap: https://www.arzaqtrading.com/sitemap.xml

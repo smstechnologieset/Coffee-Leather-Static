@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if the user is an admin
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'admin@arzaq.com' || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user') == 'admin')
+      );
+    }
+
+    // Helper function to check if user is NOT banned
+    function isNotBanned() {
+      return request.auth != null && (
+        request.auth.token.email == 'admin@arzaq.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('status', 'active') != 'banned')
+      );
+    }
+
+    // --- Public Content ---
+    match /products/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /categories/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /partners/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /blogs/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // --- User Data ---
+    match /users/{userId} {
+      // BREAK RECURSION: Allow users to read their OWN document without any helper function calls.
+      // Helper functions like isAdmin() call get() on the current user's document, 
+      // which would trigger this rule recursively if and isAdmin check was included here.
+      allow get: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow admins to view other users and list the entire collection
+      allow get: if request.auth != null && request.auth.uid != userId && isAdmin();
+      allow list: if isAdmin();
+      
+      // Write rules - safe to call isNotBanned() now because Get (own doc) is recursion-free.
+      allow write: if request.auth != null && ((request.auth.uid == userId && isNotBanned()) || isAdmin());
+    }
+    
+    // --- Messages & Requests ---
+    match /messages/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    
+    match /requests/{document=**} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+    
+    match /sample_requests/{requestId} {
+      allow create: if isNotBanned();
+      allow read, update, delete: if isAdmin();
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    match /contract_requests/{requestId} {
+      allow create: if isNotBanned();
+      allow read, update, delete: if isAdmin();
+      allow read: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid);
+    }
+
+    // Fallback for any other collections
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
