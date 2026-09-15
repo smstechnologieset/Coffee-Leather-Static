@@ -27,7 +27,21 @@ create table if not exists public.site_settings (
 );
 
 -- =============================================================================
--- 2. coffee_products
+-- 2. buyer_profiles
+-- Buyer profiles linked to Supabase Auth users.
+-- =============================================================================
+create table if not exists public.buyer_profiles (
+  id         uuid primary key references auth.users(id) on delete cascade,
+  full_name  text,
+  company    text,
+  country    text,
+  phone      text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- =============================================================================
+-- 3. coffee_products
 -- The exportable Ethiopian coffee catalog.
 -- =============================================================================
 create table if not exists public.coffee_products (
@@ -50,11 +64,12 @@ create table if not exists public.coffee_products (
 );
 
 -- =============================================================================
--- 3. sample_requests
+-- 4. sample_requests
 -- Public buyers requesting a coffee sample.
 -- =============================================================================
 create table if not exists public.sample_requests (
   id                     uuid primary key default gen_random_uuid(),
+  buyer_id               uuid references public.buyer_profiles(id) on delete cascade,
   product_id             uuid references public.coffee_products(id) on delete set null,
   company_name           text not null,
   buyer_name             text not null,
@@ -71,11 +86,12 @@ create table if not exists public.sample_requests (
 );
 
 -- =============================================================================
--- 4. contract_requests
+-- 5. contract_requests
 -- Buyer initiating a bulk purchase contract.
 -- =============================================================================
 create table if not exists public.contract_requests (
   id                   uuid primary key default gen_random_uuid(),
+  buyer_id             uuid references public.buyer_profiles(id) on delete cascade,
   product_id           uuid references public.coffee_products(id) on delete set null,
   buyer_name           text not null,
   company_name         text not null,
@@ -99,7 +115,7 @@ create table if not exists public.contract_requests (
 );
 
 -- =============================================================================
--- 5. contract_documents
+-- 6. contract_documents
 -- Storage references to PDFs uploaded by admin staff.
 -- =============================================================================
 create table if not exists public.contract_documents (
@@ -111,7 +127,7 @@ create table if not exists public.contract_documents (
 );
 
 -- =============================================================================
--- 6. staff
+-- 7. staff
 -- Staff accounts linked to Supabase Auth users.
 -- After sign-up, insert a row here with the auth user id to grant access.
 -- =============================================================================
@@ -125,7 +141,7 @@ create table if not exists public.staff (
 );
 
 -- =============================================================================
--- 7. contact_submissions
+-- 8. contact_submissions
 -- Main site contact form entries.
 -- =============================================================================
 create table if not exists public.contact_submissions (
@@ -134,20 +150,6 @@ create table if not exists public.contact_submissions (
   email      text not null,
   message    text not null,
   created_at timestamptz not null default now()
-);
-
--- =============================================================================
--- 8. notifications (optional — mock email event log)
--- Used in place of a real email service during this build phase.
--- =============================================================================
-create table if not exists public.notifications (
-  id           uuid primary key default gen_random_uuid(),
-  event_type   text not null,     -- e.g. 'sample_request_received', 'contract_sent'
-  recipient    text not null,     -- email address (mock — not actually sent)
-  subject      text,
-  body         text,
-  metadata     jsonb,             -- optional extra context
-  created_at   timestamptz not null default now()
 );
 
 -- =============================================================================
@@ -170,6 +172,10 @@ begin
 end;
 $$;
 
+create or replace trigger trg_buyer_profiles_updated_at
+  before update on public.buyer_profiles
+  for each row execute function public.set_updated_at();
+
 create or replace trigger trg_coffee_products_updated_at
   before update on public.coffee_products
   for each row execute function public.set_updated_at();
@@ -181,3 +187,39 @@ create or replace trigger trg_sample_requests_updated_at
 create or replace trigger trg_contract_requests_updated_at
   before update on public.contract_requests
   for each row execute function public.set_updated_at();
+
+-- =============================================================================
+-- Row Level Security (RLS) Policies
+-- =============================================================================
+
+-- Enable RLS on all tables
+alter table public.site_settings enable row level security;
+alter table public.buyer_profiles enable row level security;
+alter table public.coffee_products enable row level security;
+alter table public.sample_requests enable row level security;
+alter table public.contract_requests enable row level security;
+alter table public.contract_documents enable row level security;
+alter table public.staff enable row level security;
+alter table public.contact_submissions enable row level security;
+
+-- Site Settings: Everyone can read, only admin can update
+create policy "Site settings are readable by everyone" on public.site_settings for select using (true);
+
+-- Buyer Profiles: Users can read/update their own profile
+create policy "Users can view own profile" on public.buyer_profiles for select using (auth.uid() = id);
+create policy "Users can insert own profile" on public.buyer_profiles for insert with check (auth.uid() = id);
+create policy "Users can update own profile" on public.buyer_profiles for update using (auth.uid() = id);
+
+-- Coffee Products: Everyone can read active products, admin can manage
+create policy "Coffee products are readable by everyone" on public.coffee_products for select using (is_active = true);
+
+-- Sample Requests: Users can view and create their own, admin can manage
+create policy "Users can view own sample requests" on public.sample_requests for select using (auth.uid() = buyer_id);
+create policy "Users can insert own sample requests" on public.sample_requests for insert with check (auth.uid() = buyer_id);
+
+-- Contract Requests: Users can view and create their own, admin can manage
+create policy "Users can view own contract requests" on public.contract_requests for select using (auth.uid() = buyer_id);
+create policy "Users can insert own contract requests" on public.contract_requests for insert with check (auth.uid() = buyer_id);
+
+-- Contact Submissions: Anyone can insert, admin can view
+create policy "Anyone can insert contact submissions" on public.contact_submissions for insert with check (true);

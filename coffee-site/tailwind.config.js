@@ -11,6 +11,10 @@ module.exports = {
     ...baseConfig.theme,
     extend: {
       ...baseConfig.theme.extend,
+      fontFamily: {
+        sans:  ['var(--font-inter)', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-playfair)', 'Playfair Display', 'ui-serif', 'Georgia', 'serif'],
+      },
     },
   },
   plugins: [],
