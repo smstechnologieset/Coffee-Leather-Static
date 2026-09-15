@@ -59,13 +59,6 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <a
-              href={SITE_CONFIG.urls.coffeeSite}
-              className="ml-4 px-5 py-2 bg-primary-500 hover:bg-primary-400 text-white text-sm
-                         font-semibold rounded-lg transition-colors duration-150"
-            >
-              Browse Coffees
-            </a>
           </nav>
 
           {/* Mobile menu button */}
@@ -95,13 +88,6 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
-            <a
-              href={SITE_CONFIG.urls.coffeeSite}
-              className="mt-2 px-4 py-3 bg-primary-500 hover:bg-primary-400 text-white text-sm
-                         font-semibold rounded-lg transition-colors duration-150 text-center"
-            >
-              Browse Coffees →
-            </a>
           </nav>
         </div>
       )}

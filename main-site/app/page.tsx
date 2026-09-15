@@ -68,6 +68,15 @@ export default function HomePage() {
             >
               Our Story
             </Link>
+            <a
+              href={SITE_CONFIG.urls.leatherSite}
+              id="hero-browse-leather"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-accent-700
+                         hover:bg-accent-600 text-white font-semibold rounded-xl
+                         transition-all duration-200 shadow-brand-lg"
+            >
+              Browse Leather <ArrowRight size={18} />
+            </a>
           </div>
         </div>
 

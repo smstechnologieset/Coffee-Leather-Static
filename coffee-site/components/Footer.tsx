@@ -9,8 +9,8 @@ const FOOTER_LINKS = {
     { name: 'Checkout', href: '/checkout' },
   ],
   Company: [
-    { name: 'About Us', href: '/about' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'About Us', href: 'http://localhost:3000/about' },
+    { name: 'Contact', href: 'http://localhost:3000/contact' },
     { name: 'Highland Roots HQ', href: 'http://localhost:3000' },
     { name: 'Leather Products', href: 'http://localhost:3002' },
   ],

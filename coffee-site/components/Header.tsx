@@ -9,8 +9,8 @@ import { Menu, X, Coffee, ChevronDown, Settings, LayoutDashboard, LogOut, ArrowL
 const NAV_LINKS = [
   { name: 'Home', href: '/' },
   { name: 'Coffees', href: '/coffees' },
-  { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact' },
+  { name: 'About', href: 'http://localhost:3000/about' },
+  { name: 'Contact', href: 'http://localhost:3000/contact' },
 ];
 
 interface User {
