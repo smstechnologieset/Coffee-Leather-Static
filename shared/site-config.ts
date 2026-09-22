@@ -2,30 +2,51 @@
  * shared/site-config.ts
  *
  * ⚠️  SINGLE SOURCE OF TRUTH for the company name and global brand constants.
- * This is the ONLY place "Highland Roots Trading PLC" should appear as a
- * hard-coded string. Update here when the client confirms the real name.
- *
- * MOCK: everything marked [MOCK] is a placeholder — see /docs/MOCK_DATA.md
+ * Update here to propagate changes across all three sites.
  */
 
 export const SITE_CONFIG = {
   // ── Company identity ───────────────────────────────────────────────────────
-  companyName:    'Highland Roots Trading PLC',          // [MOCK] replace with real name
-  companyTagline: 'Ethiopia\'s Finest, Delivered to the World', // [MOCK]
-  foundedYear:    2019,                                  // [MOCK]
+  companyName:    'KIJIJ International LLC',
+  companyTagline: 'Ethiopian Specialty Coffee & Premium Leather — Products, Not Just Opportunities',
+  foundedYear:    2019,                                  // [MOCK — confirm with client]
 
   // ── Contact details ────────────────────────────────────────────────────────
   contact: {
-    email:   'info@highlandroots.example.com',           // [MOCK]
-    phone:   '+251 11 234 5678',                         // [MOCK]
-    address: 'Bole Road, Addis Ababa, Ethiopia',         // [MOCK]
+    email:   'kijjiinternational@gmail.com',
+    emails: [
+      'kijjiinternational@gmail.com',
+      'Rabbani1946@gmail.com',
+      'fahmikemal88@gmail.com',
+    ],
+    phone:   '+1 (850) 264-5268',
+    phones: [
+      { label: 'USA',      number: '+1 (850) 264-5268' },
+      { label: 'Ethiopia', number: '+251 905 458 008' },
+      { label: 'Ethiopia', number: '+251 912 334 771' },
+    ],
+    address: '121 Gladys Lane, Saluda, SC 29138, USA',
+    offices: [
+      {
+        label:   'USA Headquarters',
+        address: '121 Gladys Lane, Saluda, SC 29138',
+        country: 'United States',
+        phone:   '+1 (850) 264-5268',
+      },
+      {
+        label:   'Ethiopia Operations Center',
+        address: 'Sebara Babur, Addis Ababa',
+        country: 'Ethiopia',
+        phone:   '+251 905 458 008',
+      },
+    ],
   },
 
   // ── Social links ───────────────────────────────────────────────────────────
   social: {
-    linkedin:  'https://linkedin.com/company/highland-roots', // [MOCK placeholder URL]
-    twitter:   'https://twitter.com/highland_roots',          // [MOCK placeholder URL]
-    instagram: 'https://instagram.com/highland_roots',        // [MOCK placeholder URL]
+    linkedin:  'https://linkedin.com/company/kijij-international', // [MOCK — update when available]
+    twitter:   'https://twitter.com/kijijiintl',                   // [MOCK — update when available]
+    instagram: 'https://instagram.com/kijijiintl',                 // [MOCK — update when available]
   },
 
   // ── Cross-site URLs (overridden by env vars at runtime) ───────────────────

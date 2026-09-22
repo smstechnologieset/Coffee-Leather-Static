@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle2, Truck, MapPin } from 'lucide-react';
+import { createBrowserClient } from '@supabase/ssr';
 
 // Static coffee data (matches catalog page)
 const COFFEES: Record<string, any> = {
@@ -18,7 +19,6 @@ const COFFEES: Record<string, any> = {
 
 export default function RequestSamplePage() {
   const params = useParams();
-  const router = useRouter();
   const productId = params.slug as string;
   const coffee = COFFEES[productId];
 
@@ -33,9 +33,63 @@ export default function RequestSamplePage() {
     deliveryMethod: 'DHL',
     notes: '',
   });
+
+  const [savedCompanies, setSavedCompanies] = useState<any[]>([]);
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const metadata = session.user.user_metadata || {};
+        const companies = metadata.companies || [];
+        const addresses = metadata.addresses || [];
+        setSavedCompanies(companies);
+        setSavedAddresses(addresses);
+        
+        // Auto-fill email and contact name if available
+        setFormData(prev => ({
+          ...prev,
+          email: session.user.email || prev.email,
+          contactName: metadata.full_name || prev.contactName,
+        }));
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleCompanySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setSelectedCompanyId(id);
+    if (id) {
+      const comp = savedCompanies.find(c => c.id === id);
+      if (comp) {
+        setFormData(prev => ({ ...prev, companyName: comp.name, country: prev.country || comp.country }));
+      }
+    }
+  };
+
+  const handleAddressSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setSelectedAddressId(id);
+    if (id) {
+      const addr = savedAddresses.find(a => a.id === id);
+      if (addr) {
+        setFormData(prev => ({ ...prev, address: addr.label, city: addr.city, country: addr.country }));
+      }
+    }
+  };
 
   if (!coffee) {
     return (
@@ -110,7 +164,21 @@ export default function RequestSamplePage() {
 
               {/* Company */}
               <div className="bg-white rounded-2xl border border-neutral-100 p-5 shadow-sm">
-                <h3 className="font-bold text-neutral-900 mb-4">Company Information</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-neutral-900">Company Information</h3>
+                  {savedCompanies.length > 0 && (
+                    <select 
+                      value={selectedCompanyId} 
+                      onChange={handleCompanySelect}
+                      className="text-sm border border-neutral-200 rounded-lg px-2 py-1 bg-neutral-50 text-neutral-600 outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">-- Use Saved Company --</option>
+                      {savedCompanies.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-1">Company Name *</label>
@@ -132,7 +200,21 @@ export default function RequestSamplePage() {
 
               {/* Delivery address */}
               <div className="bg-white rounded-2xl border border-neutral-100 p-5 shadow-sm">
-                <h3 className="font-bold text-neutral-900 mb-4 flex items-center gap-2"><MapPin className="h-4 w-4 text-primary-600" /> Delivery Address</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-neutral-900 flex items-center gap-2"><MapPin className="h-4 w-4 text-primary-600" /> Delivery Address</h3>
+                  {savedAddresses.length > 0 && (
+                    <select 
+                      value={selectedAddressId} 
+                      onChange={handleAddressSelect}
+                      className="text-sm border border-neutral-200 rounded-lg px-2 py-1 bg-neutral-50 text-neutral-600 outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">-- Use Saved Address --</option>
+                      {savedAddresses.map(a => (
+                        <option key={a.id} value={a.id}>{a.label}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
                 <div className="space-y-3">
                   <input type="text" value={formData.address} onChange={(e) => update('address', e.target.value)}
                     className="w-full border border-neutral-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Street address" />

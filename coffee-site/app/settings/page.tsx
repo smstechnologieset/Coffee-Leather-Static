@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
-import { User, Building2, MapPin, FlaskConical, Edit2, Trash2, Plus, Save } from 'lucide-react';
+import { User, Building2, MapPin, FlaskConical, Edit2, Trash2, Plus, Save, X } from 'lucide-react';
 
 type Tab = 'profile' | 'companies' | 'addresses' | 'requests';
 
@@ -11,13 +11,21 @@ export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock data for demo
-  const [companies, setCompanies] = useState([{ id: 1, name: 'Nordic Roasters AB', country: 'Sweden', vat: 'SE123456789' }]);
-  const [addresses, setAddresses] = useState([{ id: 1, label: 'Main Warehouse', city: 'Stockholm', country: 'Sweden' }]);
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
   const [requests] = useState([
     { id: '1', type: 'Sample', product: 'Yirgacheffe Grade 1', status: 'Shipped', date: '2026-09-12' },
     { id: '2', type: 'Contract', product: 'Guji Zone Natural G1', status: 'Pending', date: '2026-09-14' },
   ]);
+
+  // Forms for adding new
+  const [showAddCompany, setShowAddCompany] = useState(false);
+  const [newCompany, setNewCompany] = useState({ name: '', country: '', vat: '' });
+  
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({ label: '', city: '', country: '' });
+
+  const [updating, setUpdating] = useState(false);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,11 +35,61 @@ export default function SettingsPage() {
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
+      if (session?.user) {
+        setUser(session.user);
+        setCompanies(session.user.user_metadata?.companies || []);
+        setAddresses(session.user.user_metadata?.addresses || []);
+      }
       setLoading(false);
     };
     fetchUser();
   }, []);
+
+  const saveMetadata = async (newCompanies: any[], newAddresses: any[]) => {
+    setUpdating(true);
+    const { data, error } = await supabase.auth.updateUser({
+      data: {
+        companies: newCompanies,
+        addresses: newAddresses,
+      }
+    });
+    if (!error && data.user) {
+      setUser(data.user);
+      setCompanies(newCompanies);
+      setAddresses(newAddresses);
+    }
+    setUpdating(false);
+  };
+
+  const handleAddCompany = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCompany.name || !newCompany.country) return;
+    const company = { ...newCompany, id: Date.now().toString() };
+    const updated = [...companies, company];
+    await saveMetadata(updated, addresses);
+    setShowAddCompany(false);
+    setNewCompany({ name: '', country: '', vat: '' });
+  };
+
+  const handleDeleteCompany = async (id: string) => {
+    const updated = companies.filter(c => c.id !== id);
+    await saveMetadata(updated, addresses);
+  };
+
+  const handleAddAddress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAddress.label || !newAddress.city || !newAddress.country) return;
+    const address = { ...newAddress, id: Date.now().toString() };
+    const updated = [...addresses, address];
+    await saveMetadata(companies, updated);
+    setShowAddAddress(false);
+    setNewAddress({ label: '', city: '', country: '' });
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    const updated = addresses.filter(a => a.id !== id);
+    await saveMetadata(companies, updated);
+  };
 
   if (loading) {
     return (
@@ -99,9 +157,6 @@ export default function SettingsPage() {
                     <label className="block text-sm font-medium text-neutral-700 mb-1">Email Address</label>
                     <input type="email" disabled value={user?.email || ''} className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 text-sm text-neutral-500 cursor-not-allowed" />
                   </div>
-                  <button className="bg-primary-700 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary-800 transition-colors mt-2">
-                    Save Changes
-                  </button>
                 </div>
               </div>
             )}
@@ -110,24 +165,70 @@ export default function SettingsPage() {
               <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-8 animate-fadeIn">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-neutral-900">My Companies</h2>
-                  <button className="flex items-center gap-2 text-primary-600 text-sm font-bold hover:text-primary-800">
+                  <button 
+                    onClick={() => setShowAddCompany(true)}
+                    className="flex items-center gap-2 text-primary-600 text-sm font-bold hover:text-primary-800"
+                  >
                     <Plus className="h-4 w-4" /> Add Company
                   </button>
                 </div>
+
+                {companies.length === 0 && !showAddCompany && (
+                  <div className="text-center py-10 bg-neutral-50 rounded-xl border border-neutral-100">
+                    <Building2 className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
+                    <p className="text-neutral-500 text-sm">No companies added yet.</p>
+                  </div>
+                )}
+
                 <div className="grid gap-4">
                   {companies.map((company) => (
                     <div key={company.id} className="border border-neutral-100 rounded-xl p-4 flex items-center justify-between hover:border-primary-200 transition-colors">
                       <div>
                         <p className="font-bold text-neutral-900">{company.name}</p>
-                        <p className="text-xs text-neutral-500">{company.country} • VAT: {company.vat}</p>
+                        <p className="text-xs text-neutral-500">{company.country} • VAT: {company.vat || 'N/A'}</p>
                       </div>
                       <div className="flex gap-2">
-                        <button className="text-neutral-400 hover:text-primary-600"><Edit2 className="h-4 w-4" /></button>
-                        <button className="text-neutral-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                        <button 
+                          onClick={() => handleDeleteCompany(company.id)}
+                          disabled={updating}
+                          className="text-neutral-400 hover:text-red-500 disabled:opacity-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
+
+                {showAddCompany && (
+                  <form onSubmit={handleAddCompany} className="mt-6 p-5 border border-primary-100 bg-primary-50/30 rounded-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-neutral-900">Add New Company</h3>
+                      <button type="button" onClick={() => setShowAddCompany(false)} className="text-neutral-400 hover:text-neutral-700">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">Company Name *</label>
+                        <input type="text" required value={newCompany.name} onChange={e => setNewCompany(prev => ({ ...prev, name: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">Country *</label>
+                          <input type="text" required value={newCompany.country} onChange={e => setNewCompany(prev => ({ ...prev, country: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">VAT Number</label>
+                          <input type="text" value={newCompany.vat} onChange={e => setNewCompany(prev => ({ ...prev, vat: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
+                        </div>
+                      </div>
+                      <button type="submit" disabled={updating} className="w-full bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-800 disabled:opacity-50">
+                        {updating ? 'Saving...' : 'Save Company'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             )}
 
@@ -135,10 +236,21 @@ export default function SettingsPage() {
               <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 sm:p-8 animate-fadeIn">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-neutral-900">Shipping Addresses</h2>
-                  <button className="flex items-center gap-2 text-primary-600 text-sm font-bold hover:text-primary-800">
+                  <button 
+                    onClick={() => setShowAddAddress(true)}
+                    className="flex items-center gap-2 text-primary-600 text-sm font-bold hover:text-primary-800"
+                  >
                     <Plus className="h-4 w-4" /> Add Address
                   </button>
                 </div>
+
+                {addresses.length === 0 && !showAddAddress && (
+                  <div className="text-center py-10 bg-neutral-50 rounded-xl border border-neutral-100">
+                    <MapPin className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
+                    <p className="text-neutral-500 text-sm">No addresses added yet.</p>
+                  </div>
+                )}
+
                 <div className="grid gap-4">
                   {addresses.map((addr) => (
                     <div key={addr.id} className="border border-neutral-100 rounded-xl p-4 flex items-center justify-between hover:border-primary-200 transition-colors">
@@ -147,12 +259,47 @@ export default function SettingsPage() {
                         <p className="text-xs text-neutral-500">{addr.city}, {addr.country}</p>
                       </div>
                       <div className="flex gap-2">
-                        <button className="text-neutral-400 hover:text-primary-600"><Edit2 className="h-4 w-4" /></button>
-                        <button className="text-neutral-400 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                        <button 
+                          onClick={() => handleDeleteAddress(addr.id)}
+                          disabled={updating}
+                          className="text-neutral-400 hover:text-red-500 disabled:opacity-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
+
+                {showAddAddress && (
+                  <form onSubmit={handleAddAddress} className="mt-6 p-5 border border-primary-100 bg-primary-50/30 rounded-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-neutral-900">Add New Address</h3>
+                      <button type="button" onClick={() => setShowAddAddress(false)} className="text-neutral-400 hover:text-neutral-700">
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-700 mb-1">Address / Street *</label>
+                        <input type="text" required value={newAddress.label} onChange={e => setNewAddress(prev => ({ ...prev, label: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">City *</label>
+                          <input type="text" required value={newAddress.city} onChange={e => setNewAddress(prev => ({ ...prev, city: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">Country *</label>
+                          <input type="text" required value={newAddress.country} onChange={e => setNewAddress(prev => ({ ...prev, country: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
+                        </div>
+                      </div>
+                      <button type="submit" disabled={updating} className="w-full bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-800 disabled:opacity-50">
+                        {updating ? 'Saving...' : 'Save Address'}
+                      </button>
+                    </div>
+                  </form>
+                )}
               </div>
             )}
 

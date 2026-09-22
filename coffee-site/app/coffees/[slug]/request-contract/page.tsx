@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CheckCircle2, FileText, MinusCircle, PlusCircle } from 'lucide-react';
+import { createBrowserClient } from '@supabase/ssr';
 
 const COFFEES: Record<string, any> = {
   '1': { name: 'Yirgacheffe Grade 1 Washed', region: 'Yirgacheffe', process: 'Washed', grade: 'Grade 1', pricePerMT: 4200, minOrderMT: 1, image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80' },
@@ -36,9 +37,63 @@ export default function RequestContractPage() {
     deliveryWindow: '60 days',
     notes: '',
   });
+
+  const [savedCompanies, setSavedCompanies] = useState<any[]>([]);
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const metadata = session.user.user_metadata || {};
+        const companies = metadata.companies || [];
+        const addresses = metadata.addresses || [];
+        setSavedCompanies(companies);
+        setSavedAddresses(addresses);
+        
+        // Auto-fill email and contact name if available
+        setFormData(prev => ({
+          ...prev,
+          email: session.user.email || prev.email,
+          contactName: metadata.full_name || prev.contactName,
+        }));
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleCompanySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setSelectedCompanyId(id);
+    if (id) {
+      const comp = savedCompanies.find(c => c.id === id);
+      if (comp) {
+        setFormData(prev => ({ ...prev, companyName: comp.name, country: prev.country || comp.country }));
+      }
+    }
+  };
+
+  const handleAddressSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setSelectedAddressId(id);
+    if (id) {
+      const addr = savedAddresses.find(a => a.id === id);
+      if (addr) {
+        setFormData(prev => ({ ...prev, address: addr.label, city: addr.city, country: addr.country }));
+      }
+    }
+  };
 
   if (!coffee) {
     return (
@@ -143,7 +198,21 @@ export default function RequestContractPage() {
               )}
 
               <div className="bg-white rounded-2xl border border-neutral-100 p-5 shadow-sm">
-                <h3 className="font-bold text-neutral-900 mb-4">Company Information</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-neutral-900">Company Information</h3>
+                  {savedCompanies.length > 0 && (
+                    <select 
+                      value={selectedCompanyId} 
+                      onChange={handleCompanySelect}
+                      className="text-sm border border-neutral-200 rounded-lg px-2 py-1 bg-neutral-50 text-neutral-600 outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">-- Use Saved Company --</option>
+                      {savedCompanies.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
@@ -169,6 +238,27 @@ export default function RequestContractPage() {
                         className="w-full border border-neutral-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="+1 234 567 8900" />
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Delivery address */}
+              <div className="bg-white rounded-2xl border border-neutral-100 p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-neutral-900 flex items-center gap-2">Delivery Address</h3>
+                  {savedAddresses.length > 0 && (
+                    <select 
+                      value={selectedAddressId} 
+                      onChange={handleAddressSelect}
+                      className="text-sm border border-neutral-200 rounded-lg px-2 py-1 bg-neutral-50 text-neutral-600 outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">-- Use Saved Address --</option>
+                      {savedAddresses.map(a => (
+                        <option key={a.id} value={a.id}>{a.label}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-neutral-600 mb-1">City</label>

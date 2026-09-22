@@ -5,26 +5,26 @@
  */
 
 export const COMPANY_COPY = {
-  tagline: "Ethiopia's Finest, Delivered to the World",
+  tagline: "Ethiopian Specialty Coffee & Premium Leather — Products, Not Just Opportunities",
   intro:
-    "Highland Roots Trading PLC is an Addis Ababa-based export and trading company connecting the agricultural wealth of the Ethiopian highlands with buyers and partners across North America, Europe, and Asia. Founded in 2019, we operate at the intersection of heritage and commerce — bringing centuries-old Ethiopian craftsmanship and world-renowned arabica coffees to a global marketplace.",
+    "KIJIJ International LLC is a USA-registered company connecting Ethiopian agricultural excellence and artisanal craftsmanship directly with buyers and partners across North America, Europe, and the Gulf. We operate at the intersection of heritage and commerce — delivering Ethiopia's world-renowned specialty coffees and premium handcrafted leather goods to a global marketplace. Our difference is simple: we sell products, not just opportunities.",
 
   mission:
-    "To create sustainable, long-term value for Ethiopian producers and international buyers by delivering the highest-quality commodities with transparency, integrity, and care.",
+    "To create sustainable, long-term value for African producers and international buyers by delivering the highest-quality commodities with transparency, integrity, and care.",
 
   vision:
-    "To be Africa's most trusted agricultural export partner — a company that sets the standard for ethical sourcing, consistent quality, and mutually beneficial trade relationships.",
+    "To be Africa's most trusted trade partner — a company that sets the standard for ethical sourcing, consistent quality, and mutually beneficial relationships.",
 
   values: [
+    {
+      title: "Products First",
+      description:
+        "We deal in real, tangible goods. From specialty coffee to premium leather — every product we trade is something we stand fully behind.",
+    },
     {
       title: "Integrity",
       description:
         "We operate transparently with every stakeholder — from the cooperatives we source from to the buyers we serve. What we say is what we deliver.",
-    },
-    {
-      title: "Quality Without Compromise",
-      description:
-        "We curate only what meets our grade standards. If a harvest doesn't meet the bar, it doesn't carry our name.",
     },
     {
       title: "Sustainable Partnership",
@@ -32,49 +32,49 @@ export const COMPANY_COPY = {
         "Long-term relationships with producers mean better livelihoods and more consistent supply. We invest in the communities behind every shipment.",
     },
     {
-      title: "Ethiopian Heritage",
+      title: "African Heritage",
       description:
-        "We are proud custodians of Ethiopia's extraordinary agri-cultural heritage. Every product we export tells a story worth sharing.",
+        "We are proud custodians of Africa's extraordinary agricultural and craft heritage. Every product we export tells a story worth sharing.",
     },
   ],
 
   about: [
-    "Highland Roots Trading PLC was established in 2019 by a team of Ethiopian entrepreneurs and trade specialists with a shared conviction: Ethiopia's extraordinary agricultural output deserved a better path to the world. The company began with a single product line — specialty-grade arabica coffees from the Yirgacheffe, Sidamo, and Guji regions — and has since expanded to include a curated portfolio of natural and processed coffees spanning Ethiopia's most celebrated growing zones.",
+    "KIJIJ International LLC is a USA-registered company with operational roots in Ethiopia. We were founded on a simple but powerful belief: the world doesn't just need more opportunities — it needs more products. Real, high-quality African goods that speak for themselves and create lasting value across the supply chain.",
 
-    "Our operations are rooted in Addis Ababa, with sourcing partnerships across nine regional cooperatives and washing stations. We work exclusively with smallholder farmers organised into certified producer groups, providing advance purchase agreements, agronomic support, and fair floor prices regardless of commodity market fluctuations.",
+    "Our flagship business is Ethiopian specialty coffee — sourced from the world's most celebrated growing regions including Yirgacheffe, Sidamo, and Guji. We work with smallholder farmers organized into certified producer groups, providing advance purchase agreements, agronomic support, and fair floor prices regardless of commodity market fluctuations.",
 
-    "In 2022, the company began exploring an adjacent opportunity in premium leather goods — Ethiopia's livestock sector produces some of the finest raw hides on the continent, yet the finished-goods market has historically been underdeveloped. The leather division of Highland Roots is currently in its early development phase, with a planned product line of premium export-quality leather goods anticipated to launch in the coming year.",
+    "We also operate a premium leather goods division, drawing on Ethiopia's exceptional livestock sector and deep craft heritage to bring export-quality leather products to the international market.",
 
-    "Today, Highland Roots Trading PLC is a trusted name for wholesale buyers in the United States, Germany, Japan, and across the Gulf. We are registered with the Ethiopian Coffee and Tea Authority and comply with all applicable export and phytosanitary regulations.",
+    "With headquarters in Saluda, South Carolina and operations based in Addis Ababa, Ethiopia, KIJIJ International bridges two continents and a world of opportunity — delivering African excellence directly to global buyers.",
   ],
 
   foundingStory: {
     year: 2019,
-    headline: "From a Single Shipment to a Trusted Name",
-    body: "It started with a 1-ton trial shipment to a small roastery in Portland, Oregon. The coffee — a washed Yirgacheffe Grade 1 — landed with a cupping score of 87.5. The roastery ordered three more containers before the next harvest season. That first relationship taught our founders everything they needed to know: quality speaks, and consistency builds trust. Highland Roots grew from there, one shipment, one partnership at a time.",
+    headline: "Products, Not Just Opportunities",
+    body: "KIJIJ International was founded on the conviction that Africa's greatest exports aren't ideas or potential — they're real products. A 1-ton trial shipment of washed Yirgacheffe Grade 1 coffee to a US roastery was the first proof of concept. It landed with a cupping score of 87.5, and three more container orders followed before the next harvest season. That first relationship taught our founders everything: quality speaks, consistency builds trust, and the world wants what Africa grows.",
   },
 
   stats: [
-    { label: "Founded", value: "2019" },
+    { label: "Headquarters", value: "USA & Ethiopia" },
     { label: "Export Markets", value: "12+" },
-    { label: "Producer Cooperatives", value: "9" },
-    { label: "Products", value: "6 Coffees" },
+    { label: "Products", value: "Coffee & Leather" },
+    { label: "Founded", value: "2019" },
   ],
 };
 
 export const NEWS_POSTS = [
   {
     slug: "new-us-partnership-2024",
-    title: "Highland Roots Secures Long-Term Supply Agreement with US Specialty Importer",
+    title: "KIJIJ International Secures Long-Term Supply Agreement with US Specialty Importer",
     date: "2024-11-08",
-    author: "Highland Roots Team",
+    author: "KIJIJ International Team",
     excerpt:
       "We are pleased to announce a three-year supply agreement with a leading specialty coffee importer based in Seattle, covering annual volumes of Yirgacheffe Washed and Guji Honey.",
     body: [
-      "Highland Roots Trading PLC has entered into a multi-year supply agreement with a prominent Pacific Northwest specialty importer, marking one of our largest single-buyer commitments to date. The agreement covers annual shipments of our flagship Yirgacheffe Washed Grade 1 and Guji Honey Grade 1 coffees, with the first container scheduled to depart from Djibouti Port in January 2025.",
+      "KIJIJ International LLC has entered into a multi-year supply agreement with a prominent Pacific Northwest specialty importer, marking one of our largest single-buyer commitments to date. The agreement covers annual shipments of our flagship Yirgacheffe Washed Grade 1 and Guji Honey Grade 1 coffees, with the first container scheduled to depart from Djibouti Port in January 2025.",
       "The agreement includes a sustainability rider requiring full traceability to the washing station level, along with an annual cupping review and a price floor guarantee for our producer partners. We believe this is the kind of long-term relationship that benefits every link in the supply chain — from the smallholder farmers in Gedeo Zone to the café customer in Seattle.",
     ],
-    image: "https://picsum.photos/seed/news1/800/450",
+    image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&q=80",
     category: "Partnerships",
   },
   {
@@ -88,21 +88,21 @@ export const NEWS_POSTS = [
       "After an 18-month audit and verification process conducted in partnership with our regional cooperative partners, three coffees in our portfolio — Yirgacheffe Washed, Sidamo Natural, and Guji Honey — have achieved organic certification through a USDA-recognised certifying body. The certification covers farming practices, post-harvest processing, and storage at the washing station level.",
       "This milestone reflects the farming methods our producer partners have practiced for generations — methods that rely on shade-grown cultivation, natural composting, and minimal chemical inputs. Formalising this through certification opens new market segments for our buyers and enables premium pricing that flows directly back to producers. We are committed to extending certification efforts to our remaining product lines over the next two harvest cycles.",
     ],
-    image: "https://picsum.photos/seed/news2/800/450",
+    image: "https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=800&q=80",
     category: "Quality",
   },
   {
     slug: "scaa-expo-2024",
-    title: "Highland Roots at the 2024 Specialty Coffee Expo, Chicago",
+    title: "KIJIJ International at the 2024 Specialty Coffee Expo, Chicago",
     date: "2024-04-22",
-    author: "Highland Roots Team",
+    author: "KIJIJ International Team",
     excerpt:
       "Our team attended the Specialty Coffee Association Expo in Chicago, where we connected with more than 40 prospective buyers and hosted cupping sessions of our full 2024 harvest lineup.",
     body: [
       "The 2024 Specialty Coffee Association Expo in Chicago was an exceptional opportunity to present the breadth and quality of Ethiopia's coffee heritage to an audience of the world's most discerning buyers. Our team hosted three dedicated cupping sessions across the two-day event, presenting all six coffees in our current portfolio — drawing consistently high scores and significant interest from roasters across the United States, Canada, and Western Europe.",
       "We connected with over 40 prospective buyers, initiating sample request processes with 18 of them. Several of those conversations are now in the contract discussion phase. We are grateful to the SCA for providing a platform where Ethiopian coffees can speak for themselves, and we look forward to returning in 2025 with an expanded lineup.",
     ],
-    image: "https://picsum.photos/seed/news3/800/450",
+    image: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=800&q=80",
     category: "Events",
   },
   {
@@ -116,7 +116,7 @@ export const NEWS_POSTS = [
       "Our sourcing team has completed its pre-harvest assessment visits across the Yirgacheffe, Sidamo, Guji, and Limu growing regions, and the outlook for the 2024 harvest is encouraging. Cooperative partner reports indicate above-average cherry volumes in all four zones, with particularly strong cherry density observed in the high-altitude plots above 2,000 masl in the Gedeo Zone.",
       "Rainfall patterns throughout the flowering and cherry development periods were consistent and well-distributed, which tends to correlate strongly with higher cup quality. Early cherry samples cupped at our Addis Ababa dry mill have scored in the 85–89 range — a strong indicator for the final harvest. We are pre-positioning container capacity and expect to begin accepting buyer commitments for the 2024 crop in March.",
     ],
-    image: "https://picsum.photos/seed/news4/800/450",
+    image: "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=800&q=80",
     category: "Sourcing",
   },
 ];
@@ -142,9 +142,115 @@ export const TEAM_MEMBERS = [
   },
 ];
 
-export const GALLERY_IMAGES = Array.from({ length: 12 }, (_, i) => ({
-  id: i + 1,
-  src: `https://picsum.photos/seed/gallery${i + 1}/600/400`,
-  alt: `Placeholder gallery image ${i + 1} — will be replaced with real photography`,
-  caption: "📷 Placeholder image — real photography coming soon",
-}));
+export interface GalleryItem {
+  id: number;
+  src: string;
+  alt: string;
+  caption: string;
+  category: 'shipping' | 'coffee' | 'leather';
+  tag: string;
+}
+
+export const GALLERY_IMAGES: GalleryItem[] = [
+  // ── Export & Shipping ──────────────────────────────────────────────────────
+  {
+    id: 1,
+    src: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&q=80",
+    alt: "Maritime Container Shipping — Cargo vessel delivering orders to international ports",
+    caption: "Ocean shipping lanes delivering ordered specialty coffees and goods to North America and Europe",
+    category: "shipping",
+    tag: "Ocean Shipping",
+  },
+  {
+    id: 2,
+    src: "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=800&q=80",
+    alt: "Deep-Water Port Terminal — Loading container shipments bound for overseas clients",
+    caption: "Direct port container loading for wholesale orders departing Djibouti",
+    category: "shipping",
+    tag: "Port Departure",
+  },
+  {
+    id: 3,
+    src: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80",
+    alt: "Container Staging Yard — Container loads of Ethiopian commodities prepared for dispatch",
+    caption: "Inspected and sealed containers ready for ocean dispatch to ordering clients",
+    category: "shipping",
+    tag: "Export Containers",
+  },
+  {
+    id: 4,
+    src: "https://images.unsplash.com/photo-1586528116493-a029325540fa?w=800&q=80",
+    alt: "Warehouse Order Fulfillment — Staged product shipments ready for overseas buyers",
+    caption: "Carefully palletized and packed coffee and leather goods prepared for global transit",
+    category: "shipping",
+    tag: "Order Dispatch",
+  },
+
+  // ── Coffee Products ────────────────────────────────────────────────────────
+  {
+    id: 5,
+    src: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800&q=80",
+    alt: "Ethiopian Highland Coffee Plantation — Canopy shade-grown arabica cultivation",
+    caption: "Lush shade-grown coffee canopy at over 2,000 masl in Southern Ethiopia",
+    category: "coffee",
+    tag: "Highland Farms",
+  },
+  {
+    id: 6,
+    src: "https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=800&q=80",
+    alt: "Selective Hand Picking — Ripe red specialty coffee cherries harvested at peak sweetness",
+    caption: "Smallholder producers selectively harvesting only the ripest cherries",
+    category: "coffee",
+    tag: "Cherry Harvest",
+  },
+  {
+    id: 7,
+    src: "https://images.unsplash.com/photo-1611078489935-0cb964de46d6?w=800&q=80",
+    alt: "Export-Grade Burlap Coffee Sacks — Graded green arabica ready for international dispatch",
+    caption: "Jute burlap sacks packed with Grade 1 specialty green coffee in Addis Ababa",
+    category: "coffee",
+    tag: "Coffee Sacks",
+  },
+  {
+    id: 8,
+    src: "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=800&q=80",
+    alt: "Sensory Cupping & Quality Control — Q-graders conducting cupping evaluations",
+    caption: "Strict cupping lab protocol measuring floral aromatics, body, and acidity",
+    category: "coffee",
+    tag: "Cupping Lab",
+  },
+
+  // ── Leather Products ───────────────────────────────────────────────────────
+  {
+    id: 9,
+    src: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&q=80",
+    alt: "Master Leather Artisan — Precision cutting and hand-tooling premium hides",
+    caption: "Centuries-old Ethiopian artisanal technique combined with modern craft standards",
+    category: "leather",
+    tag: "Artisan Craft",
+  },
+  {
+    id: 10,
+    src: "https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800&q=80",
+    alt: "Handcrafted Leather Travel Goods — Weekender duffel bag in premium tanned leather",
+    caption: "Supple, full-grain Ethiopian leather travel bags built for longevity",
+    category: "leather",
+    tag: "Leather Duffel",
+  },
+  {
+    id: 11,
+    src: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=80",
+    alt: "Handstitched Leather Tote — Structured women's tote in full-grain cognac leather",
+    caption: "Export-ready leather handbags celebrating rich natural texture and patina",
+    category: "leather",
+    tag: "Artisan Tote",
+  },
+  {
+    id: 12,
+    src: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
+    alt: "Artisanal Leather Backpack — Durable travel rucksack handcrafted from Ethiopian hides",
+    caption: "Premium Ethiopian leather accessories designed for international retail markets",
+    category: "leather",
+    tag: "Leather Goods",
+  },
+];
