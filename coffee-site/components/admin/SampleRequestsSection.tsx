@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const MOCK_REQUESTS = [
-  { id: 'sr1', productName: 'Yirgacheffe Grade 1 Washed', companyName: 'Nordic Roasters AB', contactName: 'Erik Johansson', email: 'erik@nordicr.se', country: 'Sweden', sampleSize: '500g', deliveryMethod: 'DHL', status: 'new', date: '2026-09-14' },
-  { id: 'sr2', productName: 'Guji Zone Natural G1', companyName: 'Blue Bottle Coffee', contactName: 'Sara Lee', email: 'sara@bluebottle.com', country: 'USA', sampleSize: '1kg', deliveryMethod: 'DHL', status: 'sample_shipped', date: '2026-09-12' },
-  { id: 'sr3', productName: 'Sidamo Natural G1', companyName: 'Café de Flore', contactName: 'Pierre Martin', email: 'pierre@cafedeflore.fr', country: 'France', sampleSize: '250g', deliveryMethod: 'Drop Location', status: 'new', date: '2026-09-11' },
-  { id: 'sr4', productName: 'Harar Longberry Natural', companyName: 'Tokyo Coffee Supply', contactName: 'Kenji Sato', email: 'kenji@tokyocoffee.jp', country: 'Japan', sampleSize: '1kg', deliveryMethod: 'DHL', status: 'closed', date: '2026-09-08' },
+  { id: 'sr1', productName: 'Yirgacheffe Grade 1 Washed', companyName: 'Nordic Roasters AB', contactName: 'Erik Johansson', email: 'erik@nordicr.se', country: 'Sweden', sampleSize: '500g', price: 0, paymentStatus: 'Complimentary', deliveryMethod: 'DHL Express', status: 'new', date: '2026-09-14' },
+  { id: 'sr2', productName: 'Guji Zone Natural G1', companyName: 'Blue Bottle Coffee', contactName: 'Sara Lee', email: 'sara@bluebottle.com', country: 'USA', sampleSize: '1kg', price: 40, paymentStatus: 'Paid via Stripe (Test)', deliveryMethod: 'DHL Express', status: 'sample_shipped', date: '2026-09-12' },
+  { id: 'sr3', productName: 'Sidamo Natural G1', companyName: 'Café de Flore', contactName: 'Pierre Martin', email: 'pierre@cafedeflore.fr', country: 'France', sampleSize: '250g', price: 0, paymentStatus: 'Complimentary', deliveryMethod: 'Addis Ababa Warehouse Pickup', status: 'new', date: '2026-09-11' },
+  { id: 'sr4', productName: 'Harar Longberry Natural', companyName: 'Tokyo Coffee Supply', contactName: 'Kenji Sato', email: 'kenji@tokyocoffee.jp', country: 'Japan', sampleSize: '2kg', price: 75, paymentStatus: 'Paid via Stripe (Test)', deliveryMethod: 'DHL Express', status: 'closed', date: '2026-09-08' },
 ];
 
 const STATUS_OPTIONS = ['new', 'sample_shipped', 'closed'];
@@ -61,20 +61,27 @@ export default function SampleRequestsSection() {
                 <p className="text-sm font-bold text-neutral-900 truncate">{req.productName}</p>
                 <p className="text-xs text-neutral-400">{req.companyName} • {req.country} • {req.date}</p>
               </div>
-              <div className="hidden sm:block text-xs text-neutral-500">{req.sampleSize}</div>
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700">{req.sampleSize}</span>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${req.price === 0 ? 'bg-green-100 text-green-800' : 'bg-indigo-100 text-indigo-800'}`}>
+                  {req.price === 0 ? 'Free' : `$${req.price}`}
+                </span>
+              </div>
               {expandedId === req.id ? <ChevronUp className="h-4 w-4 text-neutral-400 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 text-neutral-400 flex-shrink-0" />}
             </div>
 
             {expandedId === req.id && (
               <div className="border-t border-neutral-100 p-5 bg-neutral-50 animate-fadeIn">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                   {[
                     ['Contact', req.contactName],
                     ['Email', req.email],
                     ['Country', req.country],
                     ['Sample Size', req.sampleSize],
-                    ['Delivery', req.deliveryMethod],
-                    ['Date', req.date],
+                    ['Sample Fee', req.price === 0 ? 'Complimentary ($0.00)' : `$${req.price}.00 USD`],
+                    ['Payment Status', req.paymentStatus],
+                    ['Delivery Method', req.deliveryMethod],
+                    ['Request Date', req.date],
                   ].map(([label, value]) => (
                     <div key={label}>
                       <p className="text-xs text-neutral-400">{label}</p>

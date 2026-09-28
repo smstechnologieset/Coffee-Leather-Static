@@ -13,64 +13,101 @@ import {
   Lock,
   ArrowRight,
   PlusCircle,
+  CreditCard,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
+import { SampleTier, DEFAULT_SAMPLE_TIERS, getStoredProduct } from '@/lib/products-data';
+import StripeTestModal from '@/components/StripeTestModal';
 
-// Static coffee data (matches catalog page)
+// Static coffee fallback data with Quintal/kg pricing and sample tiers in grams/kg
 const COFFEES: Record<string, any> = {
   '1': {
     name: 'Yirgacheffe Grade 1 Washed',
     region: 'Yirgacheffe',
     process: 'Washed',
     grade: 'Grade 1',
-    price: '$4,200/MT',
-    minOrder: '1 MT',
+    price: '$420/Quintal ($4.20/kg)',
+    minOrder: '10 Quintals (1,000 kg)',
     image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80',
+    sampleTiers: [
+      { id: '1', size: '250g', price: 0, isFree: true },
+      { id: '2', size: '500g', price: 0, isFree: true },
+      { id: '3', size: '1kg', price: 15, isFree: false },
+      { id: '4', size: '2kg', price: 25, isFree: false },
+    ],
   },
   '2': {
     name: 'Sidamo Natural G1',
     region: 'Sidamo',
     process: 'Natural',
     grade: 'Grade 1',
-    price: '$3,800/MT',
-    minOrder: '1 MT',
+    price: '$380/Quintal ($3.80/kg)',
+    minOrder: '10 Quintals (1,000 kg)',
     image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600&q=80',
+    sampleTiers: [
+      { id: '1', size: '250g', price: 0, isFree: true },
+      { id: '2', size: '500g', price: 0, isFree: true },
+      { id: '3', size: '1kg', price: 12, isFree: false },
+    ],
   },
   '3': {
     name: 'Harar Longberry Natural',
     region: 'Harar',
     process: 'Natural',
     grade: 'Grade 1',
-    price: '$4,600/MT',
-    minOrder: '500 KG',
+    price: '$460/Quintal ($4.60/kg)',
+    minOrder: '5 Quintals (500 kg)',
     image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80',
+    sampleTiers: [
+      { id: '1', size: '250g', price: 0, isFree: true },
+      { id: '2', size: '500g', price: 10, isFree: false },
+      { id: '3', size: '1kg', price: 18, isFree: false },
+    ],
   },
   '4': {
     name: 'Limu Washed G2',
     region: 'Limu',
     process: 'Washed',
     grade: 'Grade 2',
-    price: '$3,400/MT',
-    minOrder: '1 MT',
+    price: '$340/Quintal ($3.40/kg)',
+    minOrder: '10 Quintals (1,000 kg)',
     image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&q=80',
+    sampleTiers: [
+      { id: '1', size: '250g', price: 0, isFree: true },
+      { id: '2', size: '500g', price: 0, isFree: true },
+      { id: '3', size: '1kg', price: 12, isFree: false },
+    ],
   },
   '5': {
     name: 'Guji Zone Natural G1',
     region: 'Guji',
     process: 'Natural',
     grade: 'Grade 1',
-    price: '$4,900/MT',
-    minOrder: '1 MT',
+    price: '$490/Quintal ($4.90/kg)',
+    minOrder: '10 Quintals (1,000 kg)',
     image: 'https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=600&q=80',
+    sampleTiers: [
+      { id: '1', size: '250g', price: 0, isFree: true },
+      { id: '2', size: '500g', price: 0, isFree: true },
+      { id: '3', size: '1kg', price: 18, isFree: false },
+      { id: '4', size: '2kg', price: 30, isFree: false },
+    ],
   },
   '6': {
     name: 'Jimma Honey Process',
     region: 'Jimma',
     process: 'Honey',
     grade: 'Grade 2',
-    price: '$4,100/MT',
-    minOrder: '500 KG',
+    price: '$410/Quintal ($4.10/kg)',
+    minOrder: '5 Quintals (500 kg)',
     image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80',
+    sampleTiers: [
+      { id: '1', size: '250g', price: 0, isFree: true },
+      { id: '2', size: '500g', price: 0, isFree: true },
+      { id: '3', size: '1kg', price: 15, isFree: false },
+    ],
   },
 };
 
@@ -78,7 +115,22 @@ export default function RequestSamplePage() {
   const params = useParams();
   const router = useRouter();
   const productId = params.slug as string;
-  const coffee = COFFEES[productId];
+
+  const [coffee, setCoffee] = useState<any>(() => getStoredProduct(productId) || COFFEES[productId] || null);
+
+  useEffect(() => {
+    const loaded = getStoredProduct(productId) || COFFEES[productId] || null;
+    if (loaded) {
+      setCoffee(loaded);
+      if (loaded.sampleTiers && loaded.sampleTiers.length > 0) {
+        setSelectedTier(loaded.sampleTiers[0]);
+        setFormData((prev) => ({ ...prev, sampleSize: loaded.sampleTiers[0].size }));
+      }
+    }
+  }, [productId]);
+
+  const sampleTiers: SampleTier[] = coffee?.sampleTiers || DEFAULT_SAMPLE_TIERS;
+  const [selectedTier, setSelectedTier] = useState<SampleTier>(sampleTiers[0]);
 
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -95,7 +147,7 @@ export default function RequestSamplePage() {
     address: '',
     city: '',
     country: '',
-    sampleSize: '250g',
+    sampleSize: sampleTiers[0]?.size || '250g',
     deliveryMethod: 'DHL',
     notes: '',
   });
@@ -103,6 +155,8 @@ export default function RequestSamplePage() {
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [showStripeModal, setShowStripeModal] = useState(false);
+  const [paymentResult, setPaymentResult] = useState<{ transactionId: string; last4: string } | null>(null);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -229,6 +283,56 @@ export default function RequestSamplePage() {
   const selectedCompany = savedCompanies.find((c) => c.id === selectedCompanyId);
   const selectedAddress = savedAddresses.find((a) => a.id === selectedAddressId);
 
+  const handleStripeSuccess = (result: { transactionId: string; last4: string }) => {
+    setPaymentResult(result);
+    setShowStripeModal(false);
+    executeSubmission(result.transactionId);
+  };
+
+  const executeSubmission = async (stripeTxId: string | null) => {
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const sampleRecord = {
+        id: `sr_${Date.now()}`,
+        productId,
+        productName: coffee.name,
+        companyName: formData.companyName,
+        contactName: formData.contactName,
+        email: formData.email,
+        address: formData.address,
+        city: formData.city,
+        country: formData.country,
+        sampleSize: selectedTier.size,
+        samplePrice: selectedTier.price,
+        isFree: selectedTier.isFree || selectedTier.price === 0,
+        deliveryMethod: formData.deliveryMethod,
+        notes: formData.notes,
+        status: stripeTxId ? 'sample_paid' : 'new',
+        paymentStatus: stripeTxId ? 'paid' : (selectedTier.isFree ? 'complimentary' : 'pending'),
+        stripeTransactionId: stripeTxId || null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const existingRequests = session.user.user_metadata?.sample_requests || [];
+        await supabase.auth.updateUser({
+          data: {
+            sample_requests: [sampleRecord, ...existingRequests],
+          },
+        });
+      }
+
+      setShowSuccess(true);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to submit sample request.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -254,13 +358,13 @@ export default function RequestSamplePage() {
       return;
     }
 
-    setSubmitting(true);
-    setError('');
+    // If sample tier has a price and has not been paid via Stripe yet, open Stripe Test Modal!
+    if (selectedTier.price > 0 && !paymentResult) {
+      setShowStripeModal(true);
+      return;
+    }
 
-    // Simulate submission
-    await new Promise((r) => setTimeout(r, 1200));
-    setSubmitting(false);
-    setShowSuccess(true);
+    await executeSubmission(paymentResult?.transactionId || null);
   };
 
   const update = (field: string, value: string) =>
@@ -297,6 +401,7 @@ export default function RequestSamplePage() {
                   src={coffee.image}
                   alt={coffee.name}
                   fill
+                  unoptimized
                   className="object-cover"
                   sizes="480px"
                 />
@@ -599,24 +704,45 @@ export default function RequestSamplePage() {
                     )}
                   </div>
 
-                  {/* Sample size */}
-                  <div className="bg-white rounded-2xl border border-neutral-100 p-5 shadow-sm">
-                    <h3 className="font-bold text-neutral-900 mb-3 text-sm">Sample Size</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {['250g', '500g', '1kg', '2kg'].map((size) => (
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() => update('sampleSize', size)}
-                          className={`px-5 py-2 rounded-full text-sm font-bold border-2 transition-all ${
-                            formData.sampleSize === size
-                              ? 'border-primary-600 bg-primary-50 text-primary-700'
-                              : 'border-neutral-200 text-neutral-600 hover:border-primary-400'
-                          }`}
-                        >
-                          {size}
-                        </button>
-                      ))}
+                  {/* Sample size & Pricing */}
+                  <div className="bg-white rounded-2xl border border-neutral-100 p-5 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-neutral-900 text-sm">Sample Size & Offering</h3>
+                      <span className="text-xs text-neutral-400">Available in grams & kg</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {sampleTiers.map((tier) => {
+                        const isSelected = selectedTier.size === tier.size;
+                        return (
+                          <button
+                            key={tier.size}
+                            type="button"
+                            onClick={() => {
+                              setSelectedTier(tier);
+                              update('sampleSize', tier.size);
+                              setPaymentResult(null); // reset prior payment if size changed
+                            }}
+                            className={`p-3 rounded-2xl border-2 text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
+                              isSelected
+                                ? 'border-primary-600 bg-primary-50/80 shadow-sm'
+                                : 'border-neutral-200 hover:border-primary-300 bg-white'
+                            }`}
+                          >
+                            <span className={`text-sm font-bold ${isSelected ? 'text-primary-900' : 'text-neutral-800'}`}>
+                              {tier.size}
+                            </span>
+                            <span
+                              className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                                tier.isFree || tier.price === 0
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-amber-100 text-amber-900'
+                              }`}
+                            >
+                              {tier.isFree || tier.price === 0 ? 'FREE' : `$${tier.price.toFixed(2)}`}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -689,12 +815,69 @@ export default function RequestSamplePage() {
                     />
                   </div>
 
+                  {/* Live Order & Fee Breakdown */}
+                  <div className="bg-neutral-900 text-white rounded-2xl p-5 shadow-md space-y-3">
+                    <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                      <div>
+                        <p className="text-xs text-neutral-400">Selected Product & Size</p>
+                        <p className="text-sm font-bold text-white">{coffee.name} ({selectedTier.size})</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-neutral-400">Sample Evaluation Fee</p>
+                        <p className="text-base font-mono font-bold text-amber-300">
+                          {selectedTier.isFree || selectedTier.price === 0
+                            ? 'Free ($0.00)'
+                            : `$${selectedTier.price.toFixed(2)} USD`}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-neutral-300">
+                      <span>Delivery Method: {formData.deliveryMethod}</span>
+                      <span className="text-neutral-400">Courier Shipping Account / Standard</span>
+                    </div>
+
+                    {paymentResult && (
+                      <div className="bg-emerald-950/80 border border-emerald-500/50 p-2.5 rounded-xl flex items-center justify-between text-xs text-emerald-300">
+                        <span className="flex items-center gap-1.5 font-semibold">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                          Stripe Test Payment Confirmed
+                        </span>
+                        <span className="font-mono text-[11px] text-emerald-400/90">{paymentResult.transactionId}</span>
+                      </div>
+                    )}
+
+                    <div className="pt-2 border-t border-neutral-800 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                        <CreditCard className="h-3.5 w-3.5 text-indigo-400" />
+                        <span>Stripe Test Mode Integrated</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-neutral-400 mr-2">Total Due:</span>
+                        <span className="text-lg font-mono font-extrabold text-white">
+                          {selectedTier.isFree || selectedTier.price === 0
+                            ? '$0.00 (Free)'
+                            : `$${selectedTier.price.toFixed(2)} USD`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-primary-700 text-white py-4 rounded-full font-bold text-base hover:bg-primary-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                    className="w-full bg-primary-700 text-white py-4 rounded-full font-bold text-base hover:bg-primary-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2"
                   >
-                    {submitting ? 'Submitting Sample Request...' : 'Submit Sample Request'}
+                    {submitting ? (
+                      'Processing Request...'
+                    ) : selectedTier.price > 0 && !paymentResult ? (
+                      <>
+                        <CreditCard className="h-4 w-4" />
+                        <span>Proceed to Stripe Test Payment (${selectedTier.price.toFixed(2)})</span>
+                      </>
+                    ) : (
+                      <span>Submit Sample Request {selectedTier.isFree ? '(Complimentary)' : ''}</span>
+                    )}
                   </button>
                 </form>
               )}
@@ -713,11 +896,20 @@ export default function RequestSamplePage() {
             <h3 className="text-2xl font-serif font-bold text-neutral-900 mb-2">
               Sample Request Sent!
             </h3>
-            <p className="text-neutral-500 text-sm mb-6 leading-relaxed">
-              We've received your sample request for <strong>{coffee.name}</strong> from company{' '}
-              <strong>{formData.companyName}</strong>. Our export team will prepare and confirm your
-              shipment details within 24 hours.
+            <p className="text-neutral-500 text-sm mb-4 leading-relaxed">
+              We&apos;ve received your sample request for <strong>{coffee.name} ({selectedTier.size})</strong> from company{' '}
+              <strong>{formData.companyName}</strong>.
             </p>
+            {paymentResult && (
+              <div className="mb-5 p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-900 text-left space-y-1">
+                <p className="font-bold flex items-center gap-1.5 text-indigo-800">
+                  <ShieldCheck className="h-4 w-4 text-indigo-600" />
+                  Stripe Payment Receipt
+                </p>
+                <p className="text-[11px] text-neutral-600">Amount: <strong>${selectedTier.price.toFixed(2)} USD</strong> (Test Mode)</p>
+                <p className="text-[11px] font-mono text-neutral-500 truncate">ID: {paymentResult.transactionId}</p>
+              </div>
+            )}
             <Link
               href="/coffees"
               className="block w-full bg-primary-700 text-white py-3 rounded-full font-bold hover:bg-primary-800 transition-colors"
@@ -727,6 +919,17 @@ export default function RequestSamplePage() {
           </div>
         </div>
       )}
+
+      {/* Stripe Test Payment Modal */}
+      <StripeTestModal
+        isOpen={showStripeModal}
+        onClose={() => setShowStripeModal(false)}
+        onSuccess={handleStripeSuccess}
+        amount={selectedTier.price}
+        title={`${coffee.name} (${selectedTier.size})`}
+        subtitle="Green Coffee Roaster Sample Evaluation Package"
+        companyName={formData.companyName || 'Buyer Company'}
+      />
     </>
   );
 }

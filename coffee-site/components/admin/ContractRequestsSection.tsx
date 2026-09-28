@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Upload } from 'lucide-react';
 
 const MOCK_CONTRACTS = [
-  { id: 'cr1', productName: 'Yirgacheffe Grade 1 Washed', companyName: 'Nordic Roasters AB', contact: 'Erik Johansson', email: 'erik@nordicr.se', quantity: 5, totalValue: 21000, status: 'pending_payment', date: '2026-09-13', deliveryWindow: '60 days' },
-  { id: 'cr2', productName: 'Guji Zone Natural G1', companyName: 'Blue Bottle Coffee', contact: 'Sara Lee', email: 'sara@bluebottle.com', quantity: 10, totalValue: 49000, status: 'paid_pending_contract', date: '2026-09-10', deliveryWindow: '90 days' },
-  { id: 'cr3', productName: 'Harar Longberry Natural', companyName: 'Tokyo Coffee Supply', contact: 'Kenji Sato', email: 'kenji@tokyocoffee.jp', quantity: 3, totalValue: 13800, status: 'contract_sent', date: '2026-09-05', deliveryWindow: '30 days' },
+  { id: 'cr1', productName: 'Yirgacheffe Grade 1 Washed', companyName: 'Nordic Roasters AB', contact: 'Erik Johansson', email: 'erik@nordicr.se', quantityQuintals: 50, quantityKg: 5000, totalValue: 21000, depositAmount: 1050, status: 'pending_payment', date: '2026-09-13', deliveryWindow: '60 days' },
+  { id: 'cr2', productName: 'Guji Zone Natural G1', companyName: 'Blue Bottle Coffee', contact: 'Sara Lee', email: 'sara@bluebottle.com', quantityQuintals: 100, quantityKg: 10000, totalValue: 49000, depositAmount: 2450, status: 'paid_pending_contract', date: '2026-09-10', deliveryWindow: '90 days' },
+  { id: 'cr3', productName: 'Harar Longberry Natural', companyName: 'Tokyo Coffee Supply', contact: 'Kenji Sato', email: 'kenji@tokyocoffee.jp', quantityQuintals: 30, quantityKg: 3000, totalValue: 13800, depositAmount: 690, status: 'contract_sent', date: '2026-09-05', deliveryWindow: '30 days' },
 ];
 
 const STATUS_FLOW = ['pending_payment', 'paid_pending_contract', 'contract_sent', 'closed'];
@@ -17,8 +17,8 @@ const STATUS_STYLES: Record<string, string> = {
   closed: 'bg-neutral-100 text-neutral-600',
 };
 const STATUS_LABELS: Record<string, string> = {
-  pending_payment: 'Pending Payment',
-  paid_pending_contract: 'Paid — Awaiting Contract',
+  pending_payment: 'Pending Deposit',
+  paid_pending_contract: 'Deposit Paid (Stripe) — Awaiting Contract',
   contract_sent: 'Contract Sent',
   closed: 'Closed',
 };
@@ -36,7 +36,7 @@ export default function ContractRequestsSection() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-serif font-bold text-neutral-900">Contract Requests</h2>
-          <p className="text-neutral-500 text-sm">{contracts.filter((c) => c.status === 'pending_payment').length} pending payment</p>
+          <p className="text-neutral-500 text-sm">{contracts.filter((c) => c.status === 'pending_payment').length} pending deposit</p>
         </div>
       </div>
 
@@ -54,7 +54,10 @@ export default function ContractRequestsSection() {
                 <p className="text-sm font-bold text-neutral-900 truncate">{contract.productName}</p>
                 <p className="text-xs text-neutral-400">{contract.companyName} • {contract.date}</p>
               </div>
-              <div className="text-sm font-bold text-primary-700 hidden sm:block">${contract.totalValue.toLocaleString()}</div>
+              <div className="text-right hidden sm:block">
+                <div className="text-sm font-bold text-primary-700">${contract.totalValue.toLocaleString()}</div>
+                <div className="text-[11px] text-neutral-400 font-mono">Deposit: ${contract.depositAmount.toLocaleString()}</div>
+              </div>
               {expandedId === contract.id ? <ChevronUp className="h-4 w-4 text-neutral-400 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 text-neutral-400 flex-shrink-0" />}
             </div>
 
@@ -64,9 +67,10 @@ export default function ContractRequestsSection() {
                   {[
                     ['Contact', contract.contact],
                     ['Email', contract.email],
-                    ['Quantity', `${contract.quantity} MT`],
+                    ['Volume', `${contract.quantityQuintals} Quintals (${contract.quantityKg.toLocaleString()} kg)`],
+                    ['Earnest Deposit (5%)', `$${contract.depositAmount.toLocaleString()} USD`],
                     ['Delivery', contract.deliveryWindow],
-                    ['Total Value', `$${contract.totalValue.toLocaleString()}`],
+                    ['Total Estimated Value', `$${contract.totalValue.toLocaleString()} USD`],
                   ].map(([label, value]) => (
                     <div key={label}>
                       <p className="text-xs text-neutral-400">{label}</p>

@@ -6,12 +6,12 @@ import Image from 'next/image';
 
 // Static coffee products for the homepage strip
 const STRIP_PRODUCTS = [
-  { id: '1', name: 'Yirgacheffe Grade 1', category: 'Washed', price: '$4,200/MT', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80', availability: 'In Stock' },
-  { id: '2', name: 'Sidamo Guji Natural', category: 'Natural', price: '$3,800/MT', image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&q=80', availability: 'In Stock' },
-  { id: '3', name: 'Harar Longberry', category: 'Natural', price: '$4,600/MT', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80', availability: 'In Stock' },
-  { id: '4', name: 'Limu Washed G2', category: 'Washed', price: '$3,400/MT', image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&q=80', availability: 'Limited' },
-  { id: '5', name: 'Guji Natural G1', category: 'Natural', price: '$4,900/MT', image: 'https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=400&q=80', availability: 'In Stock' },
-  { id: '6', name: 'Jimma Honey Process', category: 'Honey', price: '$4,100/MT', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80', availability: 'In Stock' },
+  { id: '1', name: 'Yirgacheffe Grade 1', category: 'Washed', price: '$420/Quintal ($4.20/kg)', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80', availability: 'In Stock' },
+  { id: '2', name: 'Sidamo Guji Natural', category: 'Natural', price: '$380/Quintal ($3.80/kg)', image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&q=80', availability: 'In Stock' },
+  { id: '3', name: 'Harar Longberry', category: 'Natural', price: '$460/Quintal ($4.60/kg)', image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80', availability: 'In Stock' },
+  { id: '4', name: 'Limu Washed G2', category: 'Washed', price: '$340/Quintal ($3.40/kg)', image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&q=80', availability: 'Limited' },
+  { id: '5', name: 'Guji Natural G1', category: 'Natural', price: '$490/Quintal ($4.90/kg)', image: 'https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=400&q=80', availability: 'In Stock' },
+  { id: '6', name: 'Jimma Honey Process', category: 'Honey', price: '$410/Quintal ($4.10/kg)', image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80', availability: 'In Stock' },
 ];
 
 // Duplicate for infinite scroll
@@ -105,6 +105,7 @@ export default function ProductsStrip() {
                 src={product.image}
                 alt={product.name}
                 fill
+                unoptimized
                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                 sizes="256px"
               />

@@ -44,8 +44,16 @@ export default function TopProductsSection() {
             {topProducts.map((p) => (
               <div key={p.id} className="bg-white p-3 rounded-xl shadow-sm flex items-center gap-4">
                 <GripVertical className="h-5 w-5 text-neutral-300 cursor-move" />
-                <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image src={p.image} alt={p.name} fill className="object-cover" sizes="48px" />
+                <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80';
+                    }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-neutral-900 truncate">{p.name}</p>
@@ -72,8 +80,16 @@ export default function TopProductsSection() {
           <div className="space-y-3">
             {otherProducts.map((p) => (
               <div key={p.id} className="border border-neutral-100 p-3 rounded-xl flex items-center gap-4 hover:bg-neutral-50 transition-colors">
-                <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image src={p.image} alt={p.name} fill className="object-cover" sizes="48px" />
+                <div className="relative h-12 w-12 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80';
+                    }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm text-neutral-900 truncate">{p.name}</p>

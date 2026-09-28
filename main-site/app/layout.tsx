@@ -20,7 +20,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_MAIN_SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(SITE_CONFIG.urls.mainSite),
   title: {
     default: `${SITE_CONFIG.companyName} — Specialty Coffee & Premium Leather`,
     template: `%s | ${SITE_CONFIG.companyName}`,

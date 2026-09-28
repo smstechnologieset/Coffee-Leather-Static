@@ -211,7 +211,7 @@ export default function ContactForm() {
           required
           value={formData.message}
           onChange={handleChange}
-          placeholder="Please describe your anticipated volume (bags or MT), delivery destination port, target arrival timeframe, or specific cupping profile preferences..."
+          placeholder="Please describe your anticipated volume (Quintals, bags, or kg), delivery destination port, target arrival timeframe, or specific cupping profile preferences..."
           className="w-full px-4 py-3 rounded-xl border border-neutral-200 text-sm text-neutral-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-colors"
         />
       </div>

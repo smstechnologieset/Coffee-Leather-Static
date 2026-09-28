@@ -25,7 +25,7 @@ export default function PriceChart({ data }: { data: PricePoint[] }) {
     labels: data.map((d) => d.date),
     datasets: [
       {
-        label: 'Price ($/MT)',
+        label: 'Price ($/Quintal)',
         data: data.map((d) => d.price),
         borderColor: '#87530a', // primary-800
         backgroundColor: (context: any) => {
@@ -65,7 +65,7 @@ export default function PriceChart({ data }: { data: PricePoint[] }) {
         cornerRadius: 10,
         displayColors: false,
         callbacks: {
-          label: (ctx: any) => `$${ctx.parsed.y.toLocaleString()}/MT`,
+          label: (ctx: any) => `$${ctx.parsed.y.toLocaleString()}/Quintal`,
         },
       },
     },

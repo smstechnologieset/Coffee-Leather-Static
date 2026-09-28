@@ -64,13 +64,13 @@ export default function Header() {
 
             {/* Desktop Nav */}
             <nav className="hidden lg:flex items-center gap-8">
-              <Link
-                href="http://localhost:3000"
+              <a
+                href={SITE_CONFIG.urls.mainSite}
                 className="flex items-center gap-1 text-xs font-medium text-neutral-500 hover:text-accent-600 transition-colors"
               >
                 <ArrowLeft className="h-3 w-3" />
                 Back to Corporate
-              </Link>
+              </a>
               <div className="h-4 w-px bg-neutral-200" />
               {NAV_LINKS.map((link) => (
                 <Link
@@ -133,9 +133,9 @@ export default function Header() {
                 <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-neutral-600">
                   <User className="h-4 w-4" /> Sign In / Account
                 </Link>
-                <Link href="http://localhost:3000" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-neutral-600">
+                <a href={SITE_CONFIG.urls.mainSite} onClick={() => setMobileOpen(false)} className="flex items-center gap-2 text-sm font-medium text-neutral-600">
                   <ArrowLeft className="h-4 w-4" /> Back to Corporate
-                </Link>
+                </a>
               </div>
             </div>
           </div>

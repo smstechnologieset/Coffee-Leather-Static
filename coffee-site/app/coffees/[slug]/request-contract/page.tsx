@@ -14,17 +14,25 @@ import {
   AlertTriangle,
   Lock,
   ArrowRight,
+  CreditCard,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
+import StripeTestModal from '@/components/StripeTestModal';
+import { getStoredProduct } from '@/lib/products-data';
 
+// Static fallback coffee data with Quintal/kg pricing (1 Quintal = 100 kg)
 const COFFEES: Record<string, any> = {
   '1': {
     name: 'Yirgacheffe Grade 1 Washed',
     region: 'Yirgacheffe',
     process: 'Washed',
     grade: 'Grade 1',
-    pricePerMT: 4200,
-    minOrderMT: 1,
+    pricePerQuintal: 420,
+    pricePerKg: 4.2,
+    minOrderQuintals: 10,
+    minOrderKg: 1000,
     image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80',
   },
   '2': {
@@ -32,8 +40,10 @@ const COFFEES: Record<string, any> = {
     region: 'Sidamo',
     process: 'Natural',
     grade: 'Grade 1',
-    pricePerMT: 3800,
-    minOrderMT: 1,
+    pricePerQuintal: 380,
+    pricePerKg: 3.8,
+    minOrderQuintals: 10,
+    minOrderKg: 1000,
     image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=600&q=80',
   },
   '3': {
@@ -41,8 +51,10 @@ const COFFEES: Record<string, any> = {
     region: 'Harar',
     process: 'Natural',
     grade: 'Grade 1',
-    pricePerMT: 4600,
-    minOrderMT: 0.5,
+    pricePerQuintal: 460,
+    pricePerKg: 4.6,
+    minOrderQuintals: 5,
+    minOrderKg: 500,
     image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80',
   },
   '4': {
@@ -50,8 +62,10 @@ const COFFEES: Record<string, any> = {
     region: 'Limu',
     process: 'Washed',
     grade: 'Grade 2',
-    pricePerMT: 3400,
-    minOrderMT: 1,
+    pricePerQuintal: 340,
+    pricePerKg: 3.4,
+    minOrderQuintals: 10,
+    minOrderKg: 1000,
     image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&q=80',
   },
   '5': {
@@ -59,8 +73,10 @@ const COFFEES: Record<string, any> = {
     region: 'Guji',
     process: 'Natural',
     grade: 'Grade 1',
-    pricePerMT: 4900,
-    minOrderMT: 1,
+    pricePerQuintal: 490,
+    pricePerKg: 4.9,
+    minOrderQuintals: 10,
+    minOrderKg: 1000,
     image: 'https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=600&q=80',
   },
   '6': {
@@ -68,8 +84,10 @@ const COFFEES: Record<string, any> = {
     region: 'Jimma',
     process: 'Honey',
     grade: 'Grade 2',
-    pricePerMT: 4100,
-    minOrderMT: 0.5,
+    pricePerQuintal: 410,
+    pricePerKg: 4.1,
+    minOrderQuintals: 5,
+    minOrderKg: 500,
     image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&q=80',
   },
 };
@@ -80,7 +98,19 @@ export default function RequestContractPage() {
   const params = useParams();
   const router = useRouter();
   const productId = params.slug as string;
-  const coffee = COFFEES[productId];
+
+  const [coffee, setCoffee] = useState<any>(() => getStoredProduct(productId) || COFFEES[productId] || null);
+
+  useEffect(() => {
+    const loaded = getStoredProduct(productId) || COFFEES[productId] || null;
+    if (loaded) {
+      setCoffee(loaded);
+      setFormData((prev) => ({
+        ...prev,
+        quantity: loaded.minOrderQuintals || prev.quantity || 10,
+      }));
+    }
+  }, [productId]);
 
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -98,7 +128,7 @@ export default function RequestContractPage() {
     address: '',
     city: '',
     country: '',
-    quantity: coffee?.minOrderMT || 1,
+    quantity: coffee?.minOrderQuintals || 10,
     deliveryWindow: '60 days',
     notes: '',
   });
@@ -106,6 +136,8 @@ export default function RequestContractPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [showStripeModal, setShowStripeModal] = useState(false);
+  const [paymentResult, setPaymentResult] = useState<{ transactionId: string; last4: string } | null>(null);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -230,10 +262,66 @@ export default function RequestContractPage() {
   const selectedCompany = savedCompanies.find((c) => c.id === selectedCompanyId);
   const selectedAddress = savedAddresses.find((a) => a.id === selectedAddressId);
 
-  const total = formData.quantity * coffee.pricePerMT;
+  const totalKg = formData.quantity * 100;
+  const totalValue = formData.quantity * coffee.pricePerQuintal;
+  // Standard earnest deposit for contract locking (5%, minimum $250)
+  const depositAmount = Math.max(250, Math.round(totalValue * 0.05));
 
   const update = (field: string, value: any) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+  const handleStripeSuccess = (result: { transactionId: string; last4: string }) => {
+    setPaymentResult(result);
+    setShowStripeModal(false);
+    executeContractSubmission(result.transactionId);
+  };
+
+  const executeContractSubmission = async (stripeTxId: string | null) => {
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const contractRecord = {
+        id: `ct_${Date.now()}`,
+        productId,
+        productName: coffee.name,
+        companyName: formData.companyName,
+        contactName: formData.contactName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        country: formData.country,
+        quantityQuintals: formData.quantity,
+        quantityKg: totalKg,
+        pricePerQuintal: coffee.pricePerQuintal,
+        totalValue,
+        depositAmount,
+        deliveryWindow: formData.deliveryWindow,
+        notes: formData.notes,
+        status: stripeTxId ? 'deposit_paid' : 'under_review',
+        paymentStatus: stripeTxId ? 'deposit_secured' : 'pending_deposit',
+        stripeTransactionId: stripeTxId || null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const existingContracts = session.user.user_metadata?.contract_requests || [];
+        await supabase.auth.updateUser({
+          data: {
+            contract_requests: [contractRecord, ...existingContracts],
+          },
+        });
+      }
+
+      setShowSuccess(true);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to initiate contract request.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -260,13 +348,13 @@ export default function RequestContractPage() {
       return;
     }
 
-    setSubmitting(true);
-    setError('');
+    // Open Stripe Test Modal for earnest deposit
+    if (!paymentResult) {
+      setShowStripeModal(true);
+      return;
+    }
 
-    // Simulate submission
-    await new Promise((r) => setTimeout(r, 1500));
-    setSubmitting(false);
-    setShowSuccess(true);
+    await executeContractSubmission(paymentResult.transactionId);
   };
 
   return (
@@ -297,6 +385,7 @@ export default function RequestContractPage() {
                   src={coffee.image}
                   alt={coffee.name}
                   fill
+                  unoptimized
                   className="object-cover"
                   sizes="480px"
                 />
@@ -313,7 +402,8 @@ export default function RequestContractPage() {
                     ['Region', coffee.region],
                     ['Grade', coffee.grade],
                     ['Process', coffee.process],
-                    ['Unit Price', `$${coffee.pricePerMT.toLocaleString()}/MT`],
+                    ['Unit Price', `$${coffee.pricePerQuintal.toLocaleString()}/Quintal ($${coffee.pricePerKg.toFixed(2)}/kg)`],
+                    ['Volume Equivalent', `${totalKg.toLocaleString()} kg (${formData.quantity} Quintals)`],
                   ].map(([label, value]) => (
                     <div
                       key={label}
@@ -327,50 +417,72 @@ export default function RequestContractPage() {
                   ))}
                 </div>
 
-                {/* Quantity selector */}
-                <div className="flex items-center justify-between py-2 border-t-2 border-neutral-200">
-                  <span className="text-sm font-bold text-neutral-700">Quantity (MT)</span>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        update('quantity', Math.max(coffee.minOrderMT, formData.quantity - 1))
-                      }
-                      className="text-primary-600 hover:text-primary-800"
-                    >
-                      <MinusCircle className="h-6 w-6" />
-                    </button>
-                    <input
-                      type="number"
-                      min={coffee.minOrderMT}
-                      value={formData.quantity}
-                      onChange={(e) =>
-                        update(
-                          'quantity',
-                          Math.max(coffee.minOrderMT, Number(e.target.value))
-                        )
-                      }
-                      className="w-20 text-center border border-neutral-200 rounded-lg py-1.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => update('quantity', formData.quantity + 1)}
-                      className="text-primary-600 hover:text-primary-800"
-                    >
-                      <PlusCircle className="h-6 w-6" />
-                    </button>
+                {/* Quantity selector in Quintals */}
+                <div className="py-3 border-t-2 border-neutral-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-sm font-bold text-neutral-800 block">Quantity (Quintals)</span>
+                      <span className="text-xs text-neutral-400">1 Quintal = 100 kg</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update(
+                            'quantity',
+                            Math.max(coffee.minOrderQuintals, formData.quantity - 1)
+                          )
+                        }
+                        className="text-primary-600 hover:text-primary-800 transition-colors"
+                      >
+                        <MinusCircle className="h-6 w-6" />
+                      </button>
+                      <input
+                        type="number"
+                        min={coffee.minOrderQuintals}
+                        value={formData.quantity}
+                        onChange={(e) =>
+                          update(
+                            'quantity',
+                            Math.max(coffee.minOrderQuintals, Number(e.target.value))
+                          )
+                        }
+                        className="w-20 text-center border border-neutral-200 rounded-lg py-1.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => update('quantity', formData.quantity + 1)}
+                        className="text-primary-600 hover:text-primary-800 transition-colors"
+                      >
+                        <PlusCircle className="h-6 w-6" />
+                      </button>
+                    </div>
                   </div>
+                  <p className="text-xs text-primary-700 mt-2 font-medium bg-primary-50 px-3 py-1.5 rounded-lg inline-block">
+                    Total: <strong>{totalKg.toLocaleString()} kg</strong> green coffee beans
+                  </p>
                 </div>
 
-                {/* Indicative Total */}
-                <div className="mt-4 pt-4 border-t-2 border-primary-200 flex justify-between items-center">
-                  <span className="font-bold text-neutral-900">Indicative Total</span>
-                  <span className="text-2xl font-bold text-primary-700">
-                    ${total.toLocaleString()}
-                  </span>
+                {/* Indicative Total & 5% Earnest Deposit */}
+                <div className="mt-4 pt-4 border-t-2 border-primary-200 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-neutral-600 font-medium">Estimated Contract Value</span>
+                    <span className="text-xl font-bold text-neutral-900">
+                      ${totalValue.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                    <div>
+                      <span className="text-xs font-bold text-amber-900 block">Stripe Test Earnest Deposit (5%)</span>
+                      <span className="text-[11px] text-amber-700">Secures coffee lot allocation</span>
+                    </div>
+                    <span className="text-lg font-mono font-bold text-amber-800">
+                      ${depositAmount.toLocaleString()} USD
+                    </span>
+                  </div>
                 </div>
-                <p className="text-xs text-neutral-400 mt-1">
-                  Subject to formal export contract negotiation and shipping schedule confirmation.
+                <p className="text-xs text-neutral-400 mt-2">
+                  Deposit paid via Stripe test mode. Remaining balance settles against Bill of Lading (B/L) and inspection certification.
                 </p>
               </div>
             </div>
@@ -691,17 +803,70 @@ export default function RequestContractPage() {
                     />
                   </div>
 
+                  {/* Live Contract Value & Earnest Deposit Breakdown */}
+                  <div className="bg-neutral-900 text-white rounded-2xl p-5 shadow-md space-y-3">
+                    <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+                      <div>
+                        <p className="text-xs text-neutral-400">Selected Product & Volume</p>
+                        <p className="text-sm font-bold text-white">
+                          {coffee.name} — {formData.quantity} Quintals ({totalKg.toLocaleString()} kg)
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-neutral-400">Total Contract Value</p>
+                        <p className="text-base font-mono font-bold text-amber-300">
+                          ${totalValue.toLocaleString()} USD
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-neutral-300">
+                      <span>Delivery Window: {formData.deliveryWindow}</span>
+                      <span className="text-neutral-400">FOB Djibouti / CIF Custom Schedule</span>
+                    </div>
+
+                    {paymentResult && (
+                      <div className="bg-emerald-950/80 border border-emerald-500/50 p-2.5 rounded-xl flex items-center justify-between text-xs text-emerald-300">
+                        <span className="flex items-center gap-1.5 font-semibold">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                          Earnest Deposit Paid via Stripe Test Mode
+                        </span>
+                        <span className="font-mono text-[11px] text-emerald-400/90">{paymentResult.transactionId}</span>
+                      </div>
+                    )}
+
+                    <div className="pt-2 border-t border-neutral-800 flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                        <CreditCard className="h-3.5 w-3.5 text-indigo-400" />
+                        <span>5% Earnest Allocation Deposit (Stripe Test Mode)</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-neutral-400 mr-2">Deposit Due:</span>
+                        <span className="text-lg font-mono font-extrabold text-white">
+                          ${depositAmount.toLocaleString()} USD
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-amber-500 text-white py-4 rounded-full font-bold text-base hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                    className="w-full bg-primary-700 text-white py-4 rounded-full font-bold text-base hover:bg-primary-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2"
                   >
-                    {submitting
-                      ? 'Initiating Contract...'
-                      : `Initiate Contract — $${total.toLocaleString()} est.`}
+                    {submitting ? (
+                      'Processing Contract Allocation...'
+                    ) : !paymentResult ? (
+                      <>
+                        <CreditCard className="h-4 w-4" />
+                        <span>Pay Earnest Deposit (${depositAmount.toLocaleString()}) & Initiate Contract · Stripe Test Mode</span>
+                      </>
+                    ) : (
+                      <span>Confirm Contract Allocation ({formData.quantity} Quintals)</span>
+                    )}
                   </button>
                   <p className="text-xs text-neutral-400 text-center">
-                    Final pricing and dispatch schedule confirmed upon formal export contract signing.
+                    Earnest deposit secures coffee lot reservation in Addis Ababa export warehouse.
                   </p>
                 </form>
               )}
@@ -721,23 +886,51 @@ export default function RequestContractPage() {
               Contract Request Initiated!
             </h3>
             <p className="text-neutral-500 text-sm mb-1">
-              <strong>{formData.quantity} MT</strong> of <strong>{coffee.name}</strong>
+              <strong>{formData.quantity} Quintals ({totalKg.toLocaleString()} kg)</strong> of{' '}
+              <strong>{coffee.name}</strong>
             </p>
-            <p className="text-neutral-500 text-sm mb-6 leading-relaxed">
+            <p className="text-neutral-500 text-sm mb-4 leading-relaxed">
               Estimated contract value:{' '}
-              <strong className="text-primary-700">${total.toLocaleString()}</strong>.
+              <strong className="text-primary-700">${totalValue.toLocaleString()} USD</strong>.
               Our trade specialists will contact <strong>{formData.companyName}</strong> within 24
               hours to finalize formal export terms.
             </p>
+
+            {paymentResult && (
+              <div className="mb-5 p-3 bg-indigo-50 border border-indigo-100 rounded-xl text-xs text-indigo-900 text-left space-y-1">
+                <p className="font-bold flex items-center gap-1.5 text-indigo-800">
+                  <ShieldCheck className="h-4 w-4 text-indigo-600" />
+                  Stripe Test Deposit Receipt
+                </p>
+                <p className="text-[11px] text-neutral-600">
+                  Secured Deposit: <strong>${depositAmount.toLocaleString()} USD</strong> (5%)
+                </p>
+                <p className="text-[11px] font-mono text-neutral-500 truncate">
+                  ID: {paymentResult.transactionId}
+                </p>
+              </div>
+            )}
+
             <Link
               href="/coffees"
               className="block w-full bg-primary-700 text-white py-3 rounded-full font-bold hover:bg-primary-800 transition-colors"
             >
-              Back to Coffees
+              Back to Catalog
             </Link>
           </div>
         </div>
       )}
+
+      {/* Stripe Test Payment Modal */}
+      <StripeTestModal
+        isOpen={showStripeModal}
+        onClose={() => setShowStripeModal(false)}
+        onSuccess={handleStripeSuccess}
+        amount={depositAmount}
+        title={`${coffee.name} — Supply Contract`}
+        subtitle={`5% Earnest Booking Deposit for ${formData.quantity} Quintals (${totalKg.toLocaleString()} kg)`}
+        companyName={formData.companyName || 'Buyer Company'}
+      />
     </>
   );
 }

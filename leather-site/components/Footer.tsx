@@ -2,28 +2,28 @@ import Link from 'next/link';
 import { Shirt, ArrowRight } from 'lucide-react';
 import { SITE_CONFIG } from '@highland/shared/site-config';
 
-const FOOTER_LINKS = {
-  Shop: [
-    { name: 'All Products', href: '/products' },
-    { name: 'Leather Bags', href: '/products?category=Bags' },
-    { name: 'Leather Jackets', href: '/products?category=Jackets' },
-    { name: 'Accessories', href: '/products?category=Accessories' },
-  ],
-  Support: [
-    { name: 'Shipping & Returns', href: '/support' },
-    { name: 'Leather Care Guide', href: '/care' },
-    { name: 'Size Guide', href: '/size-guide' },
-    { name: 'Track Order', href: '/account' },
-  ],
-  Company: [
-    { name: 'Highland Roots HQ', href: 'http://localhost:3000' },
-    { name: 'Coffee Trading', href: 'http://localhost:3001' },
-    { name: 'About Us', href: 'http://localhost:3000/about' },
-    { name: 'Contact', href: 'http://localhost:3000/contact' },
-  ],
-};
-
 export default function Footer() {
+  const footerLinks = {
+    Shop: [
+      { name: 'All Products', href: '/products' },
+      { name: 'Leather Bags', href: '/products?category=Bags' },
+      { name: 'Leather Jackets', href: '/products?category=Jackets' },
+      { name: 'Accessories', href: '/products?category=Accessories' },
+    ],
+    Support: [
+      { name: 'Shipping & Returns', href: '/support' },
+      { name: 'Leather Care Guide', href: '/care' },
+      { name: 'Size Guide', href: '/size-guide' },
+      { name: 'Track Order', href: '/account' },
+    ],
+    Company: [
+      { name: 'KIJIJ HQ', href: SITE_CONFIG.urls.mainSite },
+      { name: 'Coffee Trading', href: SITE_CONFIG.urls.coffeeSite },
+      { name: 'About Us', href: `${SITE_CONFIG.urls.mainSite}/about` },
+      { name: 'Contact', href: `${SITE_CONFIG.urls.mainSite}/contact` },
+    ],
+  };
+
   return (
     <footer className="bg-neutral-950 text-neutral-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -35,8 +35,8 @@ export default function Footer() {
                 <Shirt className="h-6 w-6 text-accent-400" />
               </div>
               <div>
-                <p className="text-white font-bold text-lg leading-none">Highland Roots</p>
-                <p className="text-accent-400 text-xs mt-1 uppercase tracking-widest">Leather Goods</p>
+                <p className="text-white font-bold text-lg leading-none">KIJIJ Leather</p>
+                <p className="text-accent-400 text-xs mt-1 uppercase tracking-widest">A Division of {SITE_CONFIG.companyName}</p>
               </div>
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm mb-8">
@@ -46,7 +46,7 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          {Object.entries(FOOTER_LINKS).map(([title, links]) => (
+          {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
               <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-5">
                 {title}

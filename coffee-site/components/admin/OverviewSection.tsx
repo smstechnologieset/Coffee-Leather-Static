@@ -21,9 +21,9 @@ const CARDS = (stats: Stats) => [
 
 const RECENT_ACTIVITY = [
   { time: '2 hrs ago', text: 'New sample request for Yirgacheffe Grade 1', type: 'sample' },
-  { time: '4 hrs ago', text: 'Contract initiated for 5 MT Guji Natural', type: 'contract' },
+  { time: '4 hrs ago', text: 'Contract initiated for 50 Quintals (5,000 kg) Guji Natural', type: 'contract' },
   { time: '6 hrs ago', text: 'New message from buyer@euroimports.com', type: 'message' },
-  { time: '1 day ago', text: 'Price updated: Harar Longberry → $4,600/MT', type: 'product' },
+  { time: '1 day ago', text: 'Price updated: Harar Longberry → $460/Quintal ($4.60/kg)', type: 'product' },
   { time: '2 days ago', text: 'New sample request for Sidamo Natural G1', type: 'sample' },
 ];
 

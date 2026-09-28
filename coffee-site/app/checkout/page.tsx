@@ -14,7 +14,7 @@ export default function CheckoutPage() {
 
   // Mock data for demo
   const amount = 21000;
-  const productName = 'Yirgacheffe Grade 1 Washed (5 MT)';
+  const productName = 'Yirgacheffe Grade 1 Washed (50 Quintals / 5,000 kg)';
 
   const handlePayment = async () => {
     setLoading(true);

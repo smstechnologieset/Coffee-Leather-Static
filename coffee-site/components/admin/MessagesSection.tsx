@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Mail, CheckCircle2 } from 'lucide-react';
 
 const MOCK_MESSAGES = [
-  { id: 'm1', name: 'James Wilson', email: 'james@eurolink.com', date: '2 hrs ago', subject: 'Inquiry regarding Harar Longberry', message: 'Hello, we are interested in ordering 5 MT of Harar Longberry. Do you have any stock from the current harvest available?', isRead: false },
+  { id: 'm1', name: 'James Wilson', email: 'james@eurolink.com', date: '2 hrs ago', subject: 'Inquiry regarding Harar Longberry', message: 'Hello, we are interested in ordering 50 Quintals (5,000 kg) of Harar Longberry. Do you have any stock from the current harvest available?', isRead: false },
   { id: 'm2', name: 'Maria Garcia', email: 'm.garcia@cafe-espana.es', date: '1 day ago', subject: 'Sample arrival', message: 'The Yirgacheffe sample arrived yesterday. We will cup it tomorrow and get back to you with our feedback.', isRead: true },
   { id: 'm3', name: 'Ahmed Al-Fayed', email: 'ahmed@gulfroasters.ae', date: '3 days ago', subject: 'Shipping terms', message: 'Could you clarify if you offer CIF terms to Dubai port for your Guji Natural?', isRead: true },
 ];
