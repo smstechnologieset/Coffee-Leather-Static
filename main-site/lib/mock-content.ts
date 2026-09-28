@@ -64,18 +64,18 @@ export const COMPANY_COPY = {
 
 export const NEWS_POSTS = [
   {
-    slug: "new-us-partnership-2024",
-    title: "KIJIJ International Secures Long-Term Supply Agreement with US Specialty Importer",
+    slug: "ethiopian-leather-goods-craft-and-use",
+    title: "Artisanal Craft & Enduring Utility: The Resilience of Ethiopian Handcrafted Leather",
     date: "2024-11-08",
-    author: "KIJIJ International Team",
+    author: "KIJIJ International Leather Division",
     excerpt:
-      "We are pleased to announce a three-year supply agreement with a leading specialty coffee importer based in Seattle, covering annual volumes of Yirgacheffe Washed and Guji Honey.",
+      "Exploring how centuries-old Ethiopian tanning traditions and premium highland hides yield weather-resilient travel weekenders, executive folios, and everyday carry built for lifelong durability.",
     body: [
-      "KIJIJ International LLC has entered into a multi-year supply agreement with a prominent Pacific Northwest specialty importer, marking one of our largest single-buyer commitments to date. The agreement covers annual shipments of our flagship Yirgacheffe Washed Grade 1 and Guji Honey Grade 1 coffees, with the first container scheduled to depart from Djibouti Port in January 2025.",
-      "The agreement includes a sustainability rider requiring full traceability to the washing station level, along with an annual cupping review and a price floor guarantee for our producer partners. We believe this is the kind of long-term relationship that benefits every link in the supply chain — from the smallholder farmers in Gedeo Zone to the café customer in Seattle.",
+      "Ethiopia's unique geography and pastoral heritage produce some of the world's most supple and durable hides, particularly high-altitude sheepskin and full-grain cowhides. At KIJIJ International, our leather goods line focuses on utilitarian luxury — crafting products that don't merely look handsome on day one, but develop rich natural patinas and resilience across years of frequent international travel and daily professional use.",
+      "From reinforced travel weekender bags engineered to fit international overhead compartments, to minimalist cardholders and weather-sealed briefcases, each piece is hand-stitched by skilled Ethiopian artisans. By combining traditional vegetable-tanning processes with modern hardware and reinforced stress points, we deliver functional leather companions suited for international executives, creatives, and discerning travelers.",
     ],
-    image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=800&q=80",
-    category: "Partnerships",
+    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
+    category: "Leather Craft",
   },
   {
     slug: "organic-certification-progress",

@@ -17,7 +17,6 @@ export default function Header() {
     { href: '/',           label: t('nav.home') },
     { href: '/about',      label: t('nav.about') },
     { href: '/businesses', label: t('nav.businesses') },
-    { href: '/gallery',    label: t('nav.gallery') },
     { href: '/news',       label: t('nav.news') },
     { href: '/currency',   label: t('nav.currency') },
     { href: '/contact',    label: t('nav.contact') },
@@ -54,7 +53,7 @@ export default function Header() {
                 {SITE_CONFIG.companyName}
               </span>
               <span className="text-neutral-400 text-[10px] uppercase tracking-[0.2em] font-medium leading-tight mt-0.5">
-                Specialty Coffee & Leather
+                {t('nav.tagline')}
               </span>
             </div>
           </Link>

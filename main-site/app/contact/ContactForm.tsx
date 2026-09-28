@@ -3,11 +3,13 @@
 import { useActionState } from 'react';
 import { submitContactForm, type ContactFormState } from './actions';
 import { Check, AlertCircle, ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const initial: ContactFormState = { status: 'idle' };
 
 export default function ContactForm() {
   const [state, action, isPending] = useActionState(submitContactForm, initial);
+  const { t, isAmharic } = useLanguage();
 
   if (state.status === 'success') {
     return (
@@ -15,9 +17,13 @@ export default function ContactForm() {
         <div className="w-12 h-12 rounded-xs border border-primary-500/30 bg-primary-100 flex items-center justify-center text-primary-700 mx-auto">
           <Check size={24} />
         </div>
-        <h3 className="text-2xl font-serif font-normal text-neutral-950">Inquiry Received</h3>
+        <h3 className="text-2xl font-serif font-normal text-neutral-950">
+          {isAmharic ? 'ጥያቄዎ ደርሶናል' : 'Inquiry Received'}
+        </h3>
         <p className="text-neutral-600 text-sm max-w-md mx-auto leading-relaxed font-light">
-          {state.message}
+          {isAmharic
+            ? 'ስላነጋገሩን እናመሰግናለን። የንግድ ክፍላችን በ1 የስራ ቀን ውስጥ ምላሽ ይሰጥዎታል።'
+            : state.message}
         </p>
       </div>
     );
@@ -36,7 +42,7 @@ export default function ContactForm() {
       {/* Name */}
       <div className="space-y-2">
         <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider font-semibold text-neutral-600">
-          Full Name <span className="text-primary-700">*</span>
+          {isAmharic ? 'ሙሉ ስም' : 'Full Name'} <span className="text-primary-700">*</span>
         </label>
         <input
           id="contact-name"
@@ -44,7 +50,7 @@ export default function ContactForm() {
           type="text"
           autoComplete="name"
           required
-          placeholder="Jane Smith"
+          placeholder={isAmharic ? 'ስምዎን እዚህ ያስገቡ' : 'Jane Smith'}
           className={`w-full px-4 py-3.5 rounded-xs border text-sm text-neutral-950
                       placeholder:text-neutral-400 focus:outline-none focus:border-primary-700
                       focus:ring-1 focus:ring-primary-700 bg-white transition-colors
@@ -58,7 +64,7 @@ export default function ContactForm() {
       {/* Email */}
       <div className="space-y-2">
         <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider font-semibold text-neutral-600">
-          Email Address <span className="text-primary-700">*</span>
+          {isAmharic ? 'የስራ ኢሜይል' : 'Email Address'} <span className="text-primary-700">*</span>
         </label>
         <input
           id="contact-email"
@@ -66,7 +72,7 @@ export default function ContactForm() {
           type="email"
           autoComplete="email"
           required
-          placeholder="jane@company.com"
+          placeholder="name@company.com"
           className={`w-full px-4 py-3.5 rounded-xs border text-sm text-neutral-950
                       placeholder:text-neutral-400 focus:outline-none focus:border-primary-700
                       focus:ring-1 focus:ring-primary-700 bg-white transition-colors
@@ -80,14 +86,18 @@ export default function ContactForm() {
       {/* Message */}
       <div className="space-y-2">
         <label htmlFor="contact-message" className="block text-xs uppercase tracking-wider font-semibold text-neutral-600">
-          Message & Requirements <span className="text-primary-700">*</span>
+          {isAmharic ? 'መልዕክት እና የፍላጎት ዝርዝር' : 'Message & Requirements'} <span className="text-primary-700">*</span>
         </label>
         <textarea
           id="contact-message"
           name="message"
           required
           rows={5}
-          placeholder="Describe your commodities interest, volume requirements, or questions for our trade team..."
+          placeholder={
+            isAmharic
+              ? 'የሚፈልጉትን የምርት ዓይነት (ልዩ ቡና ወይም የቆዳ ውጤቶች)፣ የኮንቴይነር መጠን ወይም ጥያቄዎችዎን እዚህ ይግለጹ...'
+              : 'Describe your commodities interest, volume requirements, or questions for our trade team...'
+          }
           className={`w-full px-4 py-3.5 rounded-xs border text-sm text-neutral-950
                       placeholder:text-neutral-400 focus:outline-none focus:border-primary-700
                       focus:ring-1 focus:ring-primary-700 bg-white transition-colors resize-none
@@ -111,11 +121,11 @@ export default function ContactForm() {
           {isPending ? (
             <>
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Transmitting Inquiry…</span>
+              <span>{isAmharic ? 'መልዕክቱ እየተላከ ነው…' : 'Transmitting Inquiry…'}</span>
             </>
           ) : (
             <>
-              <span>Send Trade Inquiry</span>
+              <span>{isAmharic ? 'የንግድ ጥያቄውን ላክ' : 'Send Trade Inquiry'}</span>
               <ArrowRight size={14} />
             </>
           )}

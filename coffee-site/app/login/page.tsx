@@ -113,7 +113,7 @@ export default function LoginPage() {
       {/* Left panel — brand image */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-primary-900">
         <Image
-          src="https://images.unsplash.com/photo-1611078489935-0cb964de46d6?w=1200&q=85"
+          src="https://images.unsplash.com/photo-1556740767-414a9c4860c1?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Ethiopian coffee cooperative"
           fill
           className="object-cover opacity-60"

@@ -1,20 +1,22 @@
+'use client';
+
 import Link from 'next/link';
-import { Mail, Phone, MapPin } from 'lucide-react';
 import { Linkedin, Twitter, Instagram } from '@/components/SocialIcons';
 import { SITE_CONFIG } from '@highland/shared/site-config';
-
-const NAV_LINKS = [
-  { href: '/',           label: 'Home' },
-  { href: '/about',      label: 'About Us' },
-  { href: '/businesses', label: 'Our Businesses' },
-  { href: '/gallery',    label: 'Gallery' },
-  { href: '/news',       label: 'News' },
-  { href: '/currency',   label: 'Exchange Rates' },
-  { href: '/contact',    label: 'Contact' },
-];
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useLanguage();
+
+  const NAV_LINKS = [
+    { href: '/',           label: t('nav.home') },
+    { href: '/about',      label: t('nav.about') },
+    { href: '/businesses', label: t('nav.businesses') },
+    { href: '/news',       label: t('nav.news') },
+    { href: '/currency',   label: t('nav.currency') },
+    { href: '/contact',    label: t('nav.contact') },
+  ];
 
   return (
     <footer className="bg-neutral-950 text-neutral-400 border-t border-neutral-800/80">
@@ -32,13 +34,13 @@ export default function Footer() {
                   {SITE_CONFIG.companyName}
                 </span>
                 <span className="text-neutral-400 text-[10px] uppercase tracking-[0.2em] font-medium">
-                  Specialty Coffee & Leather
+                  {t('footer.subtitle')}
                 </span>
               </div>
             </div>
 
             <p className="text-neutral-400 text-sm leading-relaxed max-w-sm">
-              {SITE_CONFIG.companyTagline}. Connecting African agricultural excellence and artisan craft directly with international buyers.
+              {t('footer.tagline')}
             </p>
 
             {/* Social links with restrained square styling */}
@@ -76,7 +78,7 @@ export default function Footer() {
           {/* Navigation — 3 cols on lg */}
           <div className="lg:col-span-3 space-y-4">
             <h3 className="text-white text-xs uppercase tracking-[0.2em] font-semibold">
-              Navigation
+              {t('footer.nav')}
             </h3>
             <ul className="space-y-2.5">
               {NAV_LINKS.map((link) => (
@@ -91,18 +93,18 @@ export default function Footer() {
               ))}
             </ul>
             <div className="pt-3 border-t border-neutral-900 space-y-2">
-              <p className="text-neutral-500 text-xs uppercase tracking-[0.16em]">Direct Sites</p>
+              <p className="text-neutral-500 text-xs uppercase tracking-[0.16em]">{t('footer.direct_sites')}</p>
               <a
                 href={SITE_CONFIG.urls.coffeeSite}
                 className="block text-sm text-neutral-300 hover:text-primary-400 transition-colors"
               >
-                Coffee Trading Platform →
+                {t('footer.coffee_link')}
               </a>
               <a
                 href={SITE_CONFIG.urls.leatherSite}
                 className="block text-sm text-neutral-300 hover:text-primary-400 transition-colors"
               >
-                Leather Goods Store →
+                {t('footer.leather_link')}
               </a>
             </div>
           </div>
@@ -110,7 +112,7 @@ export default function Footer() {
           {/* Offices & Contact — 5 cols on lg */}
           <div className="lg:col-span-5 space-y-5">
             <h3 className="text-white text-xs uppercase tracking-[0.2em] font-semibold">
-              Global Offices & Inquiries
+              {t('footer.offices')}
             </h3>
             <div className="space-y-4 text-sm">
               {/* Offices */}
@@ -125,7 +127,7 @@ export default function Footer() {
 
               {/* All 3 Phone Lines */}
               <div className="pt-2 border-t border-neutral-900">
-                <p className="text-neutral-500 text-xs uppercase tracking-wider mb-2">Telephone Lines</p>
+                <p className="text-neutral-500 text-xs uppercase tracking-wider mb-2">{t('footer.phones')}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {SITE_CONFIG.contact.phones.map((phone, idx) => (
                     <div key={idx} className="text-xs">
@@ -143,7 +145,7 @@ export default function Footer() {
 
               {/* All 3 Email Inquiries */}
               <div className="pt-2 border-t border-neutral-900">
-                <p className="text-neutral-500 text-xs uppercase tracking-wider mb-2">Email Inquiries</p>
+                <p className="text-neutral-500 text-xs uppercase tracking-wider mb-2">{t('footer.emails')}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {SITE_CONFIG.contact.emails.map((email) => (
                     <a
@@ -164,9 +166,9 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
-          <p>© {year} {SITE_CONFIG.companyName}. All rights reserved.</p>
+          <p>© {year} {SITE_CONFIG.companyName}. {t('footer.rights')}</p>
           <p className="text-neutral-500">
-            Powered by{' '}
+            {t('footer.powered_by')}{' '}
             <a
               href="https://smstechnologieset.com"
               target="_blank"

@@ -3,21 +3,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { RefreshCw, ArrowRightLeft, TrendingUp } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 const CURRENCIES = [
-  { code: 'USD', name: 'US Dollar',        flag: '🇺🇸' },
-  { code: 'ETB', name: 'Ethiopian Birr',   flag: '🇪🇹' },
-  { code: 'EUR', name: 'Euro',             flag: '🇪🇺' },
-  { code: 'GBP', name: 'British Pound',    flag: '🇬🇧' },
-  { code: 'JPY', name: 'Japanese Yen',     flag: '🇯🇵' },
-  { code: 'AED', name: 'UAE Dirham',       flag: '🇦🇪' },
-  { code: 'SAR', name: 'Saudi Riyal',      flag: '🇸🇦' },
-  { code: 'CNY', name: 'Chinese Yuan',     flag: '🇨🇳' },
-  { code: 'CAD', name: 'Canadian Dollar',  flag: '🇨🇦' },
-  { code: 'CHF', name: 'Swiss Franc',      flag: '🇨🇭' },
+  { code: 'USD', name: 'US Dollar',        amName: 'የአሜሪካ ዶላር',      flag: '🇺🇸' },
+  { code: 'ETB', name: 'Ethiopian Birr',   amName: 'የኢትዮጵያ ብር',       flag: '🇪🇹' },
+  { code: 'EUR', name: 'Euro',             amName: 'ዩሮ',              flag: '🇪🇺' },
+  { code: 'GBP', name: 'British Pound',    amName: 'የብሪታንያ ፓውንድ',   flag: '🇬🇧' },
+  { code: 'JPY', name: 'Japanese Yen',     amName: 'የጃፓን የን',        flag: '🇯🇵' },
+  { code: 'AED', name: 'UAE Dirham',       amName: 'የተባበሩት አረብ ዲርሃም', flag: '🇦🇪' },
+  { code: 'SAR', name: 'Saudi Riyal',      amName: 'የሳውዲ ሪያል',       flag: '🇸🇦' },
+  { code: 'CNY', name: 'Chinese Yuan',     amName: 'የቻይና ዩዋን',       flag: '🇨🇳' },
+  { code: 'CAD', name: 'Canadian Dollar',  amName: 'የካናዳ ዶላር',       flag: '🇨🇦' },
+  { code: 'CHF', name: 'Swiss Franc',      amName: 'የስዊስ ፍራንክ',      flag: '🇨🇭' },
 ];
 
 export default function CurrencyClient() {
+  const { t, isAmharic } = useLanguage();
   const [rates, setRates] = useState<Record<string, number>>({});
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -36,11 +38,11 @@ export default function CurrencyClient() {
       setRates(data.rates);
       setLastUpdated(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     } catch {
-      setError('Could not fetch live rates. Please try refreshing.');
+      setError(isAmharic ? 'የምንዛሬ ተመኖችን ማግኘት አልተቻለም። እባክዎ እንደገና ይሞክሩ።' : 'Could not fetch live rates. Please try refreshing.');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAmharic]);
 
   useEffect(() => {
     fetchRates();
@@ -61,11 +63,10 @@ export default function CurrencyClient() {
   };
 
   const getCurrencyInfo = (code: string) =>
-    CURRENCIES.find(c => c.code === code) ?? { code, name: code, flag: '🌍' };
+    CURRENCIES.find(c => c.code === code) ?? { code, name: code, amName: code, flag: '🌍' };
 
   return (
     <main className="min-h-screen bg-white flex flex-col">
-
       {/* ── 1. Page Header (Fluid Responsive) ───────────────────────────────── */}
       <section className="pt-28 pb-14 sm:pt-32 sm:pb-20 bg-neutral-950 text-white relative overflow-hidden border-b border-neutral-800">
         <div className="absolute inset-0">
@@ -85,16 +86,18 @@ export default function CurrencyClient() {
             <div className="inline-flex items-center gap-2 px-2.5 py-1 border border-primary-500/30 bg-primary-950/60 rounded-xs">
               <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
               <span className="text-primary-300 text-[11px] sm:text-xs uppercase tracking-[0.2em] font-medium">
-                Live Trade Corridor Rates
+                {isAmharic ? 'የቀጥታ የንግድ የምንዛሬ ተመን' : 'Live Trade Corridor Rates'}
               </span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-normal text-white leading-tight tracking-tight">
-              Trade Currency Exchange
+              {t('currency.hero.title')}
             </h1>
 
             <p className="text-neutral-300 text-sm sm:text-base lg:text-lg font-light leading-relaxed">
-              Foreign exchange rates for key agricultural and artisan trade corridors. Synchronized for export contracts and international settlement.
+              {isAmharic
+                ? 'ለግብርና እና የእጅ ጥበብ ምርቶች ንግድ የዋና ዋና ገንዘቦች የምንዛሬ ተመን። ለኤክስፖርት ውሎች እና ዓለም አቀፍ ክፍያዎች የተዘጋጀ።'
+                : 'Foreign exchange rates for key agricultural and artisan trade corridors. Synchronized for export contracts and international settlement.'}
             </p>
           </div>
         </div>
@@ -112,13 +115,13 @@ export default function CurrencyClient() {
                   <TrendingUp size={16} />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-serif font-normal text-neutral-950">
-                  Trade Rate Calculator
+                  {t('currency.calc.title')}
                 </h2>
               </div>
 
               {lastUpdated && (
                 <div className="flex items-center justify-between sm:justify-end gap-2 text-xs text-neutral-400 pl-10 sm:pl-0">
-                  <span>Updated: {lastUpdated}</span>
+                  <span>{isAmharic ? 'የታደሰው፡' : 'Updated:'} {lastUpdated}</span>
                   <button
                     onClick={fetchRates}
                     disabled={loading}
@@ -136,7 +139,7 @@ export default function CurrencyClient() {
               {/* "From" Row */}
               <div>
                 <label className="block text-[11px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
-                  Amount & Origin Currency
+                  {isAmharic ? 'መጠን እና መነሻ ገንዘብ' : 'Amount & Origin Currency'}
                 </label>
                 <div className="flex gap-2 sm:gap-3">
                   <input
@@ -153,7 +156,9 @@ export default function CurrencyClient() {
                     className="w-28 sm:w-36 border border-neutral-300 rounded-xs px-2.5 sm:px-3 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium text-neutral-900 bg-neutral-50 focus:outline-none focus:border-primary-700 flex-shrink-0 cursor-pointer"
                   >
                     {CURRENCIES.map(c => (
-                      <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.code}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -167,19 +172,19 @@ export default function CurrencyClient() {
                   aria-label="Swap currencies"
                 >
                   <ArrowRightLeft size={13} />
-                  <span>Swap</span>
+                  <span>{isAmharic ? 'ቀይር' : 'Swap'}</span>
                 </button>
               </div>
 
               {/* "To" Result Row */}
               <div>
                 <label className="block text-[11px] sm:text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">
-                  Converted Result
+                  {isAmharic ? 'የተለወጠ ውጤት' : 'Converted Result'}
                 </label>
                 <div className="flex gap-2 sm:gap-3">
                   <div className="flex-1 min-w-0 border border-neutral-200 bg-neutral-50 rounded-xs px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center overflow-hidden">
                     {loading ? (
-                      <span className="text-neutral-400 text-xs sm:text-sm">Calculating...</span>
+                      <span className="text-neutral-400 text-xs sm:text-sm">{isAmharic ? 'በማስላት ላይ...' : 'Calculating...'}</span>
                     ) : (
                       <span className="text-lg sm:text-xl lg:text-2xl font-serif font-normal text-neutral-950 break-all truncate">
                         {convertedAmount()}
@@ -192,14 +197,16 @@ export default function CurrencyClient() {
                     className="w-28 sm:w-36 border border-neutral-300 rounded-xs px-2.5 sm:px-3 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium text-neutral-900 bg-neutral-50 focus:outline-none focus:border-primary-700 flex-shrink-0 cursor-pointer"
                   >
                     {CURRENCIES.map(c => (
-                      <option key={c.code} value={c.code}>{c.flag} {c.code}</option>
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.code}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
             </div>
 
-            {/* Rate Summary Strip (Responsive wrapping) */}
+            {/* Rate Summary Strip */}
             {!loading && rates[fromCurrency] && rates[toCurrency] && (
               <div className="pt-3 sm:pt-4 border-t border-neutral-150 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-neutral-500">
                 <span className="truncate">
@@ -208,7 +215,7 @@ export default function CurrencyClient() {
                     {(rates[toCurrency] / rates[fromCurrency]).toFixed(4)} {toCurrency}
                   </strong>
                 </span>
-                <span className="text-neutral-400 text-[11px]">Interbank benchmark</span>
+                <span className="text-neutral-400 text-[11px]">{isAmharic ? 'የአመላካች ምንዛሬ ተመን' : 'Interbank benchmark'}</span>
               </div>
             )}
 
@@ -222,15 +229,17 @@ export default function CurrencyClient() {
         </div>
       </section>
 
-      {/* ── 3. Foreign Exchange Rates Table (Mobile Optimized) ───────────────── */}
+      {/* ── 3. Foreign Exchange Rates Table ─────────────────────────────────── */}
       <section className="py-12 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-3 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8 pb-4 border-b border-neutral-200">
             <div>
               <h2 className="text-xl sm:text-2xl font-serif font-normal text-neutral-950">
-                Key Trade Currencies vs. USD
+                {isAmharic ? 'ዋና ዋና የንግድ ምንዛሬዎች ከ USD አንጻር' : 'Key Trade Currencies vs. USD'}
               </h2>
-              <p className="text-neutral-500 text-xs mt-0.5">Indicative market rates for commodity and trade settlements</p>
+              <p className="text-neutral-500 text-xs mt-0.5">
+                {isAmharic ? 'ለሸቀጦች እና ለንግድ ክፍያዎች አመላካች የገበያ ተመን' : 'Indicative market rates for commodity and trade settlements'}
+              </p>
             </div>
 
             <button
@@ -239,17 +248,17 @@ export default function CurrencyClient() {
               className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider font-semibold text-primary-700 hover:text-primary-800 disabled:opacity-50 transition-colors self-start sm:self-auto"
             >
               <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
-              <span>Refresh Rates</span>
+              <span>{isAmharic ? 'ተመኖችን አድስ' : 'Refresh Rates'}</span>
             </button>
           </div>
 
-          {/* Table with responsive horizontal scroll and compact padding */}
+          {/* Table with responsive horizontal scroll */}
           <div className="border border-neutral-200 rounded-xs overflow-x-auto bg-white">
             <table className="w-full text-left min-w-[340px] sm:min-w-full">
               <thead className="bg-neutral-50 border-b border-neutral-200 text-[11px] sm:text-xs uppercase tracking-wider font-semibold text-neutral-500">
                 <tr>
-                  <th className="px-3 sm:px-6 py-3">Currency</th>
-                  <th className="px-3 sm:px-6 py-3">Code</th>
+                  <th className="px-3 sm:px-6 py-3">{isAmharic ? 'ገንዘብ' : 'Currency'}</th>
+                  <th className="px-3 sm:px-6 py-3">{isAmharic ? 'ኮድ' : 'Code'}</th>
                   <th className="px-3 sm:px-6 py-3 text-right">1 USD =</th>
                 </tr>
               </thead>
@@ -259,7 +268,9 @@ export default function CurrencyClient() {
                     <td className="px-3 sm:px-6 py-3.5">
                       <div className="flex items-center gap-2 sm:gap-3">
                         <span className="text-lg sm:text-xl flex-shrink-0">{currency.flag}</span>
-                        <span className="font-medium text-neutral-900 truncate">{currency.name}</span>
+                        <span className="font-medium text-neutral-900 truncate">
+                          {isAmharic ? currency.amName : currency.name}
+                        </span>
                       </div>
                     </td>
                     <td className="px-3 sm:px-6 py-3.5">
@@ -286,11 +297,12 @@ export default function CurrencyClient() {
           </div>
 
           <p className="text-center text-xs text-neutral-400 mt-6 font-light">
-            Rates sourced via global exchange rate feeds. For informational and commercial planning purposes only.
+            {isAmharic
+              ? 'ተመኖች ከዓለም አቀፍ የምንዛሬ መረጃዎች የተገኙ ናቸው። ለመረጃ እና ለንግድ እቅድ ብቻ የሚያገለግሉ።'
+              : 'Rates sourced via global exchange rate feeds. For informational and commercial planning purposes only.'}
           </p>
         </div>
       </section>
-
     </main>
   );
 }
