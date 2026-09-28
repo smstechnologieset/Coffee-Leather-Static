@@ -12,7 +12,7 @@ interface StripeTestModalProps {
   subtitle: string;
   companyName: string;
   productId?: string;
-  type?: 'sample' | 'contract';
+  type?: 'sample' | 'contract' | 'direct_order';
   customerEmail?: string;
   deliveryAddress?: string;
   sampleSize?: string;

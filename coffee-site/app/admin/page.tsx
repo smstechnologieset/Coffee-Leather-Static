@@ -4,21 +4,23 @@ import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import {
   LayoutDashboard, Package, FlaskConical, FileText, MessageSquare,
-  Star, LogOut, Menu, X, TrendingUp, Users, ChevronRight, Lock, ShieldCheck
+  Star, LogOut, Menu, X, TrendingUp, Users, ChevronRight, Lock, ShieldCheck, ShoppingBag
 } from 'lucide-react';
 
 // ── Section imports ────────────────────────────────────────────
 import OverviewSection from '@/components/admin/OverviewSection';
+import OrdersSection from '@/components/admin/OrdersSection';
 import ProductsSection from '@/components/admin/ProductsSection';
 import SampleRequestsSection from '@/components/admin/SampleRequestsSection';
 import ContractRequestsSection from '@/components/admin/ContractRequestsSection';
 import MessagesSection from '@/components/admin/MessagesSection';
 import TopProductsSection from '@/components/admin/TopProductsSection';
 
-type Section = 'overview' | 'products' | 'sample-requests' | 'contract-requests' | 'messages' | 'top-products';
+type Section = 'overview' | 'orders' | 'products' | 'sample-requests' | 'contract-requests' | 'messages' | 'top-products';
 
 const NAV_ITEMS: { id: Section; label: string; icon: React.ElementType }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+  { id: 'orders', label: 'Orders', icon: ShoppingBag },
   { id: 'products', label: 'Products', icon: Package },
   { id: 'sample-requests', label: 'Sample Requests', icon: FlaskConical },
   { id: 'contract-requests', label: 'Contract Requests', icon: FileText },
@@ -124,6 +126,7 @@ export default function AdminPage() {
   }
   const SECTION_LABELS: Record<Section, string> = {
     'overview': 'Dashboard Overview',
+    'orders': 'Direct Consumer Orders',
     'products': 'Products & Categories',
     'sample-requests': 'Sample Requests',
     'contract-requests': 'Contract Requests',
@@ -134,6 +137,7 @@ export default function AdminPage() {
   const renderSection = () => {
     switch (activeSection) {
       case 'overview': return <OverviewSection stats={MOCK_STATS} onNavigate={setActiveSection} />;
+      case 'orders': return <OrdersSection />;
       case 'products': return <ProductsSection />;
       case 'sample-requests': return <SampleRequestsSection />;
       case 'contract-requests': return <ContractRequestsSection />;

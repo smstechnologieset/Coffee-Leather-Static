@@ -3,13 +3,18 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Search, X, TrendingUp, TrendingDown, Minus, Sparkles, ShieldCheck, ChevronRight, PackageCheck } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import {
   CoffeeProduct,
   INITIAL_COFFEES,
   getStoredProducts,
 } from '@/lib/products-data';
+import {
+  OrderNowProduct,
+  INITIAL_ORDER_NOW_PRODUCTS,
+  getOrderNowProducts,
+} from '@/lib/order-products-data';
 
 const PriceChart = dynamic(() => import('@/components/coffees/PriceChart'), { ssr: false });
 
@@ -27,6 +32,8 @@ export default function CoffeesPage() {
   const [itemsToShow, setItemsToShow] = useState(6);
   const [selectedCoffee, setSelectedCoffee] = useState<CoffeeProduct | null>(null);
 
+  const [orderNowProducts, setOrderNowProducts] = useState<OrderNowProduct[]>(INITIAL_ORDER_NOW_PRODUCTS);
+
   // Sync with persistent store and listen for admin additions/edits
   useEffect(() => {
     const syncProducts = () => {
@@ -34,14 +41,20 @@ export default function CoffeesPage() {
       if (stored && stored.length > 0) {
         setCoffees(stored);
       }
+      const storedOrderNow = getOrderNowProducts();
+      if (storedOrderNow && storedOrderNow.length > 0) {
+        setOrderNowProducts(storedOrderNow);
+      }
     };
 
     syncProducts();
 
     window.addEventListener('kijij_products_updated', syncProducts);
+    window.addEventListener('kijij_order_products_updated', syncProducts);
     window.addEventListener('storage', syncProducts);
     return () => {
       window.removeEventListener('kijij_products_updated', syncProducts);
+      window.removeEventListener('kijij_order_products_updated', syncProducts);
       window.removeEventListener('storage', syncProducts);
     };
   }, []);
@@ -147,7 +160,118 @@ export default function CoffeesPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+      {/* ── Top Section: Order Now Packaged Coffees for Direct Consumer Purchase ── */}
+      <section className="bg-neutral-900 text-white py-12 border-b border-neutral-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
+                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                Direct Packaged Coffee • Worldwide Delivery
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white">
+                Packaged Specialty Roasts (Order Now)
+              </h2>
+              <p className="text-neutral-400 text-sm mt-1 max-w-2xl">
+                Freshly roasted in small batches in Addis Ababa and sealed in aroma-valve pouches. Designed for individual customers living abroad — order directly with 100% full Stripe payment without commercial wholesale registration.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {orderNowProducts.map((prod) => (
+              <div
+                key={prod.id}
+                className="bg-neutral-800/80 rounded-2xl border border-neutral-700/80 overflow-hidden hover:border-amber-500/60 transition duration-300 flex flex-col group shadow-lg"
+              >
+                {/* Product image */}
+                <div className="relative h-52 w-full bg-neutral-950 overflow-hidden">
+                  <Image
+                    src={prod.image}
+                    alt={prod.name}
+                    fill
+                    className="object-cover group-hover:scale-105 transition duration-500"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-black/30" />
+
+                  {prod.featured && (
+                    <div className="absolute top-3 left-3">
+                      <span className="bg-amber-500 text-neutral-950 text-[11px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-md">
+                        Flagship Blend
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="absolute top-3 right-3">
+                    <span className="bg-black/60 backdrop-blur-md text-white text-xs font-semibold px-2.5 py-1 rounded-full border border-white/20">
+                      {prod.packageWeight} {prod.unit}
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <span className="text-xs text-amber-400 font-medium block">{prod.origin}</span>
+                    <h3 className="font-serif font-bold text-xl text-white">{prod.name}</h3>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                  <p className="text-xs text-neutral-300 line-clamp-2 leading-relaxed">
+                    {prod.description}
+                  </p>
+
+                  {/* Flavor Notes */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {prod.flavorNotes.slice(0, 3).map((note) => (
+                      <span
+                        key={note}
+                        className="text-[11px] bg-neutral-700/80 text-neutral-200 px-2.5 py-0.5 rounded-full border border-neutral-600/50"
+                      >
+                        {note}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Pricing and Action */}
+                  <div className="pt-3 border-t border-neutral-700/60 flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] text-neutral-400 uppercase tracking-wider block">Price</span>
+                      <span className="font-mono font-bold text-xl text-white">
+                        ${prod.price.toFixed(2)}
+                      </span>
+                      <span className="text-[11px] text-neutral-400 ml-1">USD</span>
+                    </div>
+
+                    <Link
+                      href={`/order-now/${prod.id}`}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold text-xs shadow-md shadow-amber-900/30 transition transform active:scale-95"
+                    >
+                      <span>Order Now</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Commercial Wholesale Lots Section ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+        <div className="mb-8 border-b border-neutral-200 pb-4">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary-700 bg-primary-50 px-3 py-1 rounded-full mb-2">
+            Commercial Wholesale Lots
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-neutral-900">
+            Export Lots & Container Shipments
+          </h2>
+          <p className="text-neutral-600 text-sm mt-1">
+            Contract offerings and sample evaluations for international coffee roasters, green bean importers, and bulk commercial buyers.
+          </p>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-8">
           {/* ── Sidebar Filters ── */}
           <aside className="lg:w-64 flex-shrink-0">

@@ -12,6 +12,7 @@ import {
   upsertStoredProduct,
   deleteStoredProduct,
 } from '@/lib/products-data';
+import OrderNowProductsTab from '@/components/admin/OrderNowProductsTab';
 
 const BASE_CATEGORIES = [
   { id: '1', name: 'Washed Coffees', process: 'Washed', image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=80' },
@@ -33,6 +34,7 @@ const SUGGESTED_REGIONS = [
 ];
 
 export default function ProductsSection() {
+  const [activeProductTab, setActiveProductTab] = useState<'commercial' | 'order-now'>('commercial');
   const [categories, setCategories] = useState(BASE_CATEGORIES);
   const [selectedCategory, setSelectedCategory] = useState<typeof BASE_CATEGORIES[0] | null>(null);
   const [allProducts, setAllProducts] = useState<CoffeeProduct[]>([]);
@@ -223,12 +225,48 @@ export default function ProductsSection() {
 
   return (
     <div>
-      {!selectedCategory ? (
-        // ── Category List View ──────────────────────────────────
+      {/* ── Top Level Product Tabs: Commercial vs Order Now ── */}
+      <div className="flex items-center gap-3 border-b border-neutral-200 pb-4 mb-6">
+        <button
+          onClick={() => {
+            setActiveProductTab('commercial');
+            setSelectedCategory(null);
+          }}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
+            activeProductTab === 'commercial'
+              ? 'bg-primary-900 text-white shadow-sm'
+              : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+          }`}
+        >
+          <span>Commercial Wholesale Lots</span>
+          <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-mono">
+            {allProducts.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => setActiveProductTab('order-now')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
+            activeProductTab === 'order-now'
+              ? 'bg-amber-700 text-white shadow-sm'
+              : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+          }`}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Order Now Products (Retail Packages)</span>
+        </button>
+      </div>
+
+      {activeProductTab === 'order-now' ? (
+        <OrderNowProductsTab />
+      ) : (
         <>
+          {!selectedCategory ? (
+            // ── Category List View ──────────────────────────────────
+            <>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-serif font-bold text-neutral-900">Product Categories</h2>
+              <h2 className="text-xl font-serif font-bold text-neutral-900">Commercial Categories</h2>
               <p className="text-neutral-500 text-sm">
                 Select a processing category to manage Ethiopian specialty lots
               </p>
@@ -499,6 +537,8 @@ export default function ProductsSection() {
           </div>
         </>
       )}
+        </>
+      )}
 
       {/* ── Product Create / Edit Modal ───────────────────────── */}
       {showProductModal && (
@@ -703,14 +743,14 @@ export default function ProductsSection() {
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 font-bold">$</span>
                     <input
                       type="number"
-                      min="50"
-                      step="5"
+                      min="1"
+                      step="any"
                       required
-                      value={productForm.pricePerQuintal}
+                      value={productForm.pricePerQuintal === 0 ? '' : productForm.pricePerQuintal}
                       onChange={(e) =>
                         setProductForm((prev) => ({
                           ...prev,
-                          pricePerQuintal: Number(e.target.value),
+                          pricePerQuintal: e.target.value === '' ? 0 : Number(e.target.value),
                         }))
                       }
                       placeholder="420"
@@ -718,7 +758,7 @@ export default function ProductsSection() {
                     />
                   </div>
                   <p className="text-[11px] text-neutral-400 mt-1">
-                    Equivalent to: <strong className="text-primary-700">${(productForm.pricePerQuintal / 100).toFixed(2)}/kg</strong>
+                    Equivalent to: <strong className="text-primary-700">${((productForm.pricePerQuintal || 0) / 100).toFixed(2)}/kg</strong>
                   </p>
                 </div>
 
@@ -729,19 +769,20 @@ export default function ProductsSection() {
                   <input
                     type="number"
                     min="1"
+                    step="any"
                     required
-                    value={productForm.minOrderQuintals}
+                    value={productForm.minOrderQuintals === 0 ? '' : productForm.minOrderQuintals}
                     onChange={(e) =>
                       setProductForm((prev) => ({
                         ...prev,
-                        minOrderQuintals: Number(e.target.value),
+                        minOrderQuintals: e.target.value === '' ? 0 : Number(e.target.value),
                       }))
                     }
                     placeholder="10"
                     className="w-full border border-neutral-300 rounded-xl px-3.5 py-2 text-sm text-neutral-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                   <p className="text-[11px] text-neutral-400 mt-1">
-                    Equivalent to: <strong className="text-neutral-700">{(productForm.minOrderQuintals * 100).toLocaleString()} kg</strong>
+                    Equivalent to: <strong className="text-neutral-700">{((productForm.minOrderQuintals || 0) * 100).toLocaleString()} kg</strong>
                   </p>
                 </div>
               </div>
@@ -822,9 +863,9 @@ export default function ProductsSection() {
                           <input
                             type="number"
                             min="0"
-                            step="1"
-                            value={tier.price}
-                            onChange={(e) => handleUpdateSampleTier(idx, 'price', parseFloat(e.target.value) || 0)}
+                            step="any"
+                            value={tier.price === 0 ? '' : tier.price}
+                            onChange={(e) => handleUpdateSampleTier(idx, 'price', e.target.value === '' ? 0 : parseFloat(e.target.value) || 0)}
                             placeholder="Price"
                             className="w-full bg-white border border-neutral-300 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary-500"
                           />

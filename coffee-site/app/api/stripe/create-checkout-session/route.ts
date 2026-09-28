@@ -27,15 +27,27 @@ export async function POST(request: Request) {
       const stripe = new Stripe(secretKey);
 
       const sizeLabel = sampleSize ? ` (${sampleSize})` : '';
-      const title = type === 'sample'
+      const title = type === 'direct_order'
+        ? `Coffee Order: ${productName}`
+        : type === 'sample'
         ? (productName.includes('(') ? `Coffee Sample: ${productName}` : `Coffee Sample: ${productName}${sizeLabel}`)
-        : `Contract Deposit: ${quantityQuintals || '10'} Quintals of ${productName}`;
+        : `Contract Payment: ${quantityQuintals || '10'} Quintals of ${productName}`;
 
-      const description = type === 'sample'
+      const description = type === 'direct_order'
+        ? `Direct personal delivery package (${sampleSize || 'Standard Pack'}) for ${companyName || 'Customer'}`
+        : type === 'sample'
         ? `Roaster sample evaluation package${sizeLabel} for ${companyName || 'Buyer'}`
-        : `Initial contract reserve deposit for ${companyName || 'Buyer'}${deliveryAddress ? ` (${deliveryAddress})` : ''}`;
+        : `Contract reserve payment for ${companyName || 'Buyer'}${deliveryAddress ? ` (${deliveryAddress})` : ''}`;
 
       const baseOrigin = origin || SITE_CONFIG.urls.coffeeSite;
+
+      const successUrl = type === 'direct_order'
+        ? `${baseOrigin}/order-now/${productId}?payment_success=true&session_id={CHECKOUT_SESSION_ID}`
+        : `${baseOrigin}/coffees/${productId}/${type === 'sample' ? 'request-sample' : 'request-contract'}?payment_success=true&session_id={CHECKOUT_SESSION_ID}`;
+
+      const cancelUrl = type === 'direct_order'
+        ? `${baseOrigin}/order-now/${productId}?payment_cancelled=true`
+        : `${baseOrigin}/coffees/${productId}/${type === 'sample' ? 'request-sample' : 'request-contract'}?payment_cancelled=true`;
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -54,8 +66,8 @@ export async function POST(request: Request) {
         ],
         mode: 'payment',
         customer_email: customerEmail || undefined,
-        success_url: `${baseOrigin}/coffees/${productId}/${type === 'sample' ? 'request-sample' : 'request-contract'}?payment_success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseOrigin}/coffees/${productId}/${type === 'sample' ? 'request-sample' : 'request-contract'}?payment_cancelled=true`,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
         metadata: {
           type,
           productId,
