@@ -22,7 +22,7 @@ export default function PurposeSection() {
           {/* Text (order-2 on lg) */}
           <div className="lg:order-1">
             <p className="text-lg text-neutral-600 leading-relaxed">
-              At Highland Roots Trading PLC, our purpose transcends commerce. We are committed to 
+              At KIJIJ Coffee, our purpose transcends commerce. We are committed to 
               fostering sustainable economic growth by facilitating coffee trade that benefits all 
               stakeholders — from smallholder farmers in the Ethiopian highlands to specialty roasters 
               across the globe.
@@ -49,8 +49,8 @@ export default function PurposeSection() {
           {/* Image (order-1 on lg) */}
           <div className="lg:order-2 relative h-96 rounded-2xl overflow-hidden shadow-brand-lg">
             <Image
-              src="https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=900&q=85"
-              alt="Ethiopian coffee farmers harvesting"
+              src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=900&q=85"
+              alt="Ethiopian highland shade-grown coffee canopy"
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"

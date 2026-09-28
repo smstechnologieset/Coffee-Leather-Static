@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Coffee, Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
+import { SITE_CONFIG } from '@highland/shared/site-config';
 
 const FOOTER_LINKS = {
   Trade: [
@@ -9,10 +10,10 @@ const FOOTER_LINKS = {
     { name: 'Checkout', href: '/checkout' },
   ],
   Company: [
-    { name: 'About Us', href: 'http://localhost:3000/about' },
-    { name: 'Contact', href: 'http://localhost:3000/contact' },
-    { name: 'Highland Roots HQ', href: 'http://localhost:3000' },
-    { name: 'Leather Products', href: 'http://localhost:3002' },
+    { name: 'About Us', href: '/about' },
+    { name: 'Contact Export Desk', href: '/contact' },
+    { name: 'KIJIJ International HQ', href: SITE_CONFIG.urls.mainSite },
+    { name: 'Artisan Leather Goods', href: SITE_CONFIG.urls.leatherSite },
   ],
   Account: [
     { name: 'Sign In', href: '/login' },
@@ -24,6 +25,8 @@ const FOOTER_LINKS = {
 const ORIGINS = ['Yirgacheffe', 'Sidamo', 'Guji', 'Harar', 'Limu', 'Jimma'];
 
 export default function Footer() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="bg-neutral-950 text-neutral-300">
       {/* Top strip */}
@@ -45,30 +48,64 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center gap-3">
               <div className="p-2 bg-primary-700 rounded-lg">
                 <Coffee className="h-6 w-6 text-amber-300" />
               </div>
               <div>
-                <p className="text-white font-bold text-lg leading-none">Highland Roots</p>
-                <p className="text-primary-400 text-xs">Coffee Trading PLC</p>
+                <p className="text-white font-bold text-lg leading-none">KIJIJ Coffee</p>
+                <p className="text-primary-400 text-xs mt-1">A Division of {SITE_CONFIG.companyName}</p>
               </div>
             </div>
-            <p className="text-sm text-neutral-400 leading-relaxed max-w-xs mb-6">
-              Premium Ethiopian specialty coffee — direct from highland farms to global buyers. 
-              Request samples, negotiate contracts, and build lasting supply chain partnerships.
+            <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
+              Premium Ethiopian specialty coffee — direct from highland cooperatives to global roasters and buyers. 
+              Request samples, negotiate contracts, and establish transparent supply chains.
             </p>
-            <div className="space-y-2">
-              <a href="mailto:coffee@highlandroots.et" className="flex items-center gap-2 text-sm text-neutral-400 hover:text-amber-300 transition-colors">
-                <Mail className="h-4 w-4 text-primary-500" /> coffee@highlandroots.et
-              </a>
-              <a href="tel:+251111234567" className="flex items-center gap-2 text-sm text-neutral-400 hover:text-amber-300 transition-colors">
-                <Phone className="h-4 w-4 text-primary-500" /> +251 11 123 4567
-              </a>
-              <p className="flex items-center gap-2 text-sm text-neutral-400">
-                <MapPin className="h-4 w-4 text-primary-500 flex-shrink-0" /> Bole Atlas, Addis Ababa, Ethiopia
-              </p>
+
+            {/* Offices & Locations */}
+            <div className="pt-2 border-t border-neutral-850 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                {SITE_CONFIG.contact.offices.map((office) => (
+                  <div key={office.label} className="border-l-2 border-primary-600 pl-2.5 space-y-0.5">
+                    <p className="text-white font-semibold">{office.label}</p>
+                    <p className="text-neutral-400">{office.address}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Telephone lines */}
+              <div className="pt-2">
+                <p className="text-neutral-500 text-[11px] uppercase tracking-wider font-semibold mb-1">Telephone Lines</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-300">
+                  {SITE_CONFIG.contact.phones.map((phone, idx) => (
+                    <a
+                      key={idx}
+                      href={`tel:${phone.number.replace(/\s/g, '')}`}
+                      className="hover:text-amber-300 transition-colors"
+                    >
+                      <span className="text-neutral-500 font-medium mr-1">{phone.label}:</span>
+                      {phone.number}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              {/* Email inquiries */}
+              <div className="pt-2">
+                <p className="text-neutral-500 text-[11px] uppercase tracking-wider font-semibold mb-1">Email Inquiries</p>
+                <div className="flex flex-col gap-1 text-xs text-neutral-300">
+                  {SITE_CONFIG.contact.emails.map((email) => (
+                    <a
+                      key={email}
+                      href={`mailto:${email}`}
+                      className="hover:text-amber-300 transition-colors truncate"
+                    >
+                      {email}
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -79,13 +116,13 @@ export default function Footer() {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.name}>
-                    <Link
+                    <a
                       href={link.href}
                       className="text-sm text-neutral-400 hover:text-amber-300 transition-colors flex items-center gap-1 group"
                     >
                       <ArrowRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                       {link.name}
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -95,15 +132,20 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-neutral-800 py-5">
+      <div className="border-t border-neutral-850 py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-neutral-500">
-          <p>© {new Date().getFullYear()} Highland Roots Trading PLC. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <span>Part of</span>
-            <Link href="http://localhost:3000" className="text-primary-400 hover:text-primary-300 transition-colors font-medium">
-              Highland Roots Group
-            </Link>
-          </div>
+          <p>© {year} {SITE_CONFIG.companyName}. All rights reserved.</p>
+          <p>
+            Powered by{' '}
+            <a
+              href="https://smstechnologieset.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-400 hover:text-amber-300 transition-colors"
+            >
+              SMS Technologies
+            </a>
+          </p>
         </div>
       </div>
     </footer>

@@ -100,7 +100,7 @@ const en: Record<string, string> = {
   'home.hero.eyebrow': 'Specialty Coffee & Premium Leather',
   'home.hero.title': 'Products, Not Just Opportunities',
   'home.hero.sub':
-    "KIJIJ International connects African excellence with the global market — delivering Ethiopia's world-renowned specialty coffees and premium handcrafted leather goods to clients across North America, Europe, and the Gulf.",
+    "KIJIJ  connects African excellence with the global market — delivering Ethiopia's world-renowned specialty coffees and premium handcrafted leather goods to clients across North America, Europe, and the Gulf.",
   'home.hero.cta_products': 'Browse Our Products',
   'home.hero.cta_contact': 'Contact Export Desk',
 
@@ -114,7 +114,7 @@ const en: Record<string, string> = {
   'home.who.eyebrow': 'Agricultural & Artisanal Heritage',
   'home.who.title': 'Exporting What Africa Truly Produces',
   'home.who.p1':
-    'KIJIJ International LLC is an American-registered company with operational roots in Ethiopia, built on a simple conviction: the world needs real products. We work directly with certified coffee farmer cooperatives across Yirgacheffe, Sidamo, and Guji, and partner with master leather artisans in Addis Ababa to bring exceptional African goods directly to international buyers.',
+    'KIJIJ  LLC is an American-registered company with operational roots in Ethiopia, built on a simple conviction: the world needs real products. We work directly with certified coffee farmer cooperatives across Yirgacheffe, Sidamo, and Guji, and partner with master leather artisans in Addis Ababa to bring exceptional African goods directly to international buyers.',
   'home.who.p2':
     'We sell products, not just opportunities. Every coffee container dispatched and every leather item produced embodies verified origin, strict grade standards, and dependable export documentation.',
   'home.who.link': 'Learn more about our heritage & mission',
@@ -167,12 +167,12 @@ const en: Record<string, string> = {
 
   // Home: News
   'home.news.eyebrow': 'Trade Journal',
-  'home.news.title': 'Dispatches from KIJIJ International',
+  'home.news.title': 'Dispatches from KIJIJ ',
   'home.news.view_all': 'View all dispatches',
 
   // Home: Bottom CTA
   'home.cta.eyebrow': 'Direct African Commodity Sourcing',
-  'home.cta.title': 'Partner with KIJIJ International',
+  'home.cta.title': 'Partner with KIJIJ ',
   'home.cta.desc':
     'Whether seeking container volumes of specialty green coffee or artisanal leather goods, our team provides reliable supply contracts and seamless trade logistics.',
   'home.cta.button': 'Initiate Trade Inquiry',
@@ -181,9 +181,9 @@ const en: Record<string, string> = {
   'about.hero.eyebrow': 'The KIJIJ Story',
   'about.hero.title': 'Products, Not Just Opportunities',
   'about.hero.sub':
-    "KIJIJ International was founded to connect Ethiopia's extraordinary agricultural and artisanal heritage with discerning global buyers.",
+    "KIJIJ  was founded to connect Ethiopia's extraordinary agricultural and artisanal heritage with discerning global buyers.",
   'about.story.eyebrow': 'Founding Conviction',
-  'about.story.title': 'The Genesis of KIJIJ International',
+  'about.story.title': 'The Genesis of KIJIJ ',
   'about.deliver.eyebrow': 'What We Deliver',
   'about.deliver.title': 'Tangible Goods, Direct Relationships',
   'about.deliver.sub':
@@ -210,7 +210,7 @@ const en: Record<string, string> = {
   'about.reach.eyebrow': 'Bilateral Reach',
   'about.reach.title': 'Dual Headquarters & Operational Footprint',
   'about.reach.p1':
-    'KIJIJ International operates with a bilateral structure designed to remove distance between African production and international commerce.',
+    'KIJIJ  operates with a bilateral structure designed to remove distance between African production and international commerce.',
   'about.reach.p2':
     'Our United States headquarters in Saluda, South Carolina manages international buyer relations, commercial contracts, customer service, and distribution partnerships across North America.',
   'about.reach.p3':
@@ -221,7 +221,7 @@ const en: Record<string, string> = {
   'businesses.hero.eyebrow': 'Our Divisions',
   'businesses.hero.title': 'Two Pillars of Ethiopian Excellence',
   'businesses.hero.sub':
-    'KIJIJ International operates two dedicated product lines — specialty Ethiopian coffee and handcrafted leather goods — exporting and delivering real products directly to customers across the world.',
+    'KIJIJ  operates two dedicated product lines — specialty Ethiopian coffee and handcrafted leather goods — exporting and delivering real products directly to customers across the world.',
   'businesses.coffee.div': 'Division 01 · Active',
   'businesses.coffee.name': 'Coffee Trading Platform',
   'businesses.coffee.tagline': 'Specialty Ethiopian Arabicas for the World',
@@ -255,7 +255,7 @@ const en: Record<string, string> = {
   'news.hero.eyebrow': 'Trade Journal & Dispatches',
   'news.hero.title': 'Announcements & Field Reports',
   'news.hero.sub':
-    'Updates on coffee harvest conditions, international trade agreements, export logistics, and organizational milestones from KIJIJ International.',
+    'Updates on coffee harvest conditions, international trade agreements, export logistics, and organizational milestones from KIJIJ .',
   'news.lead.badge': 'Featured Dispatch',
   'news.secondary.title': 'Recent Dispatches',
 

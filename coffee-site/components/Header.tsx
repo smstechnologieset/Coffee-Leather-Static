@@ -5,12 +5,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { Menu, X, Coffee, ChevronDown, Settings, LayoutDashboard, LogOut, ArrowLeft } from 'lucide-react';
+import { SITE_CONFIG } from '@highland/shared/site-config';
 
 const NAV_LINKS = [
   { name: 'Home', href: '/' },
   { name: 'Coffees', href: '/coffees' },
-  { name: 'About', href: 'http://localhost:3000/about' },
-  { name: 'Contact', href: 'http://localhost:3000/contact' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
 ];
 
 interface User {
@@ -46,16 +47,16 @@ export default function Header() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
-        // Check role from user_metadata or profiles table
-        const role = session.user.user_metadata?.role || 'user';
-        setUserRole(role);
+        const isAdmin = session.user.email?.toLowerCase() === 'admin@mixed.com' || session.user.user_metadata?.role === 'admin';
+        setUserRole(isAdmin ? 'admin' : (session.user.user_metadata?.role || 'user'));
       }
     };
     getUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      setUserRole(session?.user?.user_metadata?.role ?? 'user');
+      const isAdmin = session?.user?.email?.toLowerCase() === 'admin@mixed.com' || session?.user?.user_metadata?.role === 'admin';
+      setUserRole(isAdmin ? 'admin' : (session?.user?.user_metadata?.role ?? 'user'));
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -100,10 +101,10 @@ export default function Header() {
               </div>
               <div>
                 <span className={`block text-sm font-bold leading-none transition-colors ${isTransparent ? 'text-white' : 'text-neutral-900'}`}>
-                  Highland Roots
+                  KIJIJ Coffee
                 </span>
                 <span className={`block text-xs leading-none transition-colors ${isTransparent ? 'text-amber-200' : 'text-primary-600'}`}>
-                  Coffee Trading
+                  Specialty Trading
                 </span>
               </div>
             </Link>
@@ -112,13 +113,13 @@ export default function Header() {
             <div className="hidden md:flex items-center gap-8">
               {/* Back to corporate */}
               <Link
-                href="http://localhost:3000"
+                href={SITE_CONFIG.urls.mainSite}
                 className={`flex items-center gap-1 text-xs font-medium transition-colors ${
                   isTransparent ? 'text-amber-200 hover:text-white' : 'text-primary-600 hover:text-primary-700'
                 }`}
               >
                 <ArrowLeft className="h-3 w-3" />
-                Highland Roots HQ
+                KIJIJ International HQ
               </Link>
 
               {NAV_LINKS.map((link) => (
@@ -217,11 +218,11 @@ export default function Header() {
           <div className="md:hidden bg-white border-t border-neutral-100 shadow-lg">
             <div className="px-4 py-4 space-y-1">
               <Link
-                href="http://localhost:3000"
+                href={SITE_CONFIG.urls.mainSite}
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-primary-600 rounded-md"
               >
-                <ArrowLeft className="h-3 w-3" /> Highland Roots HQ
+                <ArrowLeft className="h-3 w-3" /> KIJIJ International HQ
               </Link>
               {NAV_LINKS.map((link) => (
                 <Link

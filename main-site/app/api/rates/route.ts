@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Currencies KIJIJ International cares about
+// Currencies KIJIJ  cares about
 const CURRENCIES = ['ETB', 'EUR', 'GBP', 'JPY', 'AED', 'SAR', 'CNY', 'CAD', 'CHF'];
 
 export const dynamic = 'force-dynamic';

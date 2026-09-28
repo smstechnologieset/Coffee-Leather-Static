@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 import {
   LayoutDashboard, Package, FlaskConical, FileText, MessageSquare,
-  Star, LogOut, Menu, X, TrendingUp, Users, ChevronRight
+  Star, LogOut, Menu, X, TrendingUp, Users, ChevronRight, Lock, ShieldCheck
 } from 'lucide-react';
 
 // ── Section imports ────────────────────────────────────────────
@@ -41,6 +41,7 @@ export default function AdminPage() {
   const [activeSection, setActiveSection] = useState<Section>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const supabase = createBrowserClient(
@@ -51,8 +52,29 @@ export default function AdminPage() {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      const role = session?.user?.user_metadata?.role || 'user';
-      setUserRole(role);
+      if (!session?.user) {
+        window.location.href = '/login?redirect=/admin';
+        return;
+      }
+      const email = session.user.email?.toLowerCase();
+      setUserEmail(session.user.email || null);
+      const isAdmin = email === 'admin@mixed.com' || session.user.user_metadata?.role === 'admin';
+      
+      if (isAdmin) {
+        setUserRole('admin');
+        // Ensure metadata reflects admin role
+        if (session.user.user_metadata?.role !== 'admin') {
+          try {
+            await supabase.auth.updateUser({
+              data: { role: 'admin' }
+            });
+          } catch (e) {
+            console.error('Failed to sync admin metadata', e);
+          }
+        }
+      } else {
+        setUserRole(session.user.user_metadata?.role || 'user');
+      }
       setLoading(false);
     };
     checkAuth();
@@ -71,7 +93,35 @@ export default function AdminPage() {
     );
   }
 
-  // Allow access for demo — in production check userRole === 'admin'
+  if (userRole !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4 pt-16">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-neutral-100 text-center">
+          <div className="w-16 h-16 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Access Restricted</h2>
+          <p className="text-neutral-600 text-sm mb-6 leading-relaxed">
+            You must be signed in with an administrator account (<span className="font-semibold text-neutral-800">admin@mixed.com</span>) to access the KIJIJ Coffee Admin Panel.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href="/login?redirect=/admin"
+              className="flex-1 px-4 py-2.5 bg-primary-700 hover:bg-primary-800 text-white rounded-xl text-sm font-medium transition text-center"
+            >
+              Sign In as Admin
+            </a>
+            <a
+              href="/coffees"
+              className="flex-1 px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl text-sm font-medium transition text-center"
+            >
+              Return to Catalog
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
   const SECTION_LABELS: Record<Section, string> = {
     'overview': 'Dashboard Overview',
     'products': 'Products & Categories',
@@ -110,7 +160,7 @@ export default function AdminPage() {
         <div className="p-5 border-b border-amber-200 flex items-center justify-between">
           <div>
             <h2 className="font-bold text-neutral-900 text-lg">Admin Panel</h2>
-            <p className="text-xs text-neutral-500">Highland Roots Coffee</p>
+            <p className="text-xs text-neutral-500">KIJIJ Coffee</p>
           </div>
           <button className="md:hidden text-neutral-500 hover:text-neutral-900" onClick={() => setSidebarOpen(false)}>
             <X className="h-5 w-5" />
@@ -160,14 +210,23 @@ export default function AdminPage() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <header className="bg-white border-b border-neutral-200 sticky top-16 z-30">
-          <div className="px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-4">
-            <button onClick={() => setSidebarOpen(true)} className="md:hidden text-neutral-500 hover:text-neutral-900">
-              <Menu className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-2 text-sm text-neutral-400">
-              <span>Admin</span>
-              <ChevronRight className="h-3 w-3" />
-              <span className="font-semibold text-neutral-900">{SECTION_LABELS[activeSection]}</span>
+          <div className="px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setSidebarOpen(true)} className="md:hidden text-neutral-500 hover:text-neutral-900">
+                <Menu className="h-5 w-5" />
+              </button>
+              <div className="flex items-center gap-2 text-sm text-neutral-400">
+                <span>Admin</span>
+                <ChevronRight className="h-3 w-3" />
+                <span className="font-semibold text-neutral-900">{SECTION_LABELS[activeSection]}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 border border-amber-300 shadow-sm">
+                <ShieldCheck className="h-3.5 w-3.5 text-amber-700" />
+                <span>{userEmail || 'admin@mixed.com'}</span>
+                <span className="bg-amber-200 text-amber-950 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Admin</span>
+              </span>
             </div>
           </div>
         </header>

@@ -7,7 +7,7 @@
 export const COMPANY_COPY = {
   tagline: "Ethiopian Specialty Coffee & Premium Leather — Products, Not Just Opportunities",
   intro:
-    "KIJIJ International LLC is a USA-registered company connecting Ethiopian agricultural excellence and artisanal craftsmanship directly with buyers and partners across North America, Europe, and the Gulf. We operate at the intersection of heritage and commerce — delivering Ethiopia's world-renowned specialty coffees and premium handcrafted leather goods to a global marketplace. Our difference is simple: we sell products, not just opportunities.",
+    "KIJIJ  LLC is a USA-registered company connecting Ethiopian agricultural excellence and artisanal craftsmanship directly with buyers and partners across North America, Europe, and the Gulf. We operate at the intersection of heritage and commerce — delivering Ethiopia's world-renowned specialty coffees and premium handcrafted leather goods to a global marketplace. Our difference is simple: we sell products, not just opportunities.",
 
   mission:
     "To create sustainable, long-term value for African producers and international buyers by delivering the highest-quality commodities with transparency, integrity, and care.",
@@ -39,19 +39,19 @@ export const COMPANY_COPY = {
   ],
 
   about: [
-    "KIJIJ International LLC is a USA-registered company with operational roots in Ethiopia. We were founded on a simple but powerful belief: the world doesn't just need more opportunities — it needs more products. Real, high-quality African goods that speak for themselves and create lasting value across the supply chain.",
+    "KIJIJ  LLC is a USA-registered company with operational roots in Ethiopia. We were founded on a simple but powerful belief: the world doesn't just need more opportunities — it needs more products. Real, high-quality African goods that speak for themselves and create lasting value across the supply chain.",
 
     "Our flagship business is Ethiopian specialty coffee — sourced from the world's most celebrated growing regions including Yirgacheffe, Sidamo, and Guji. We work with smallholder farmers organized into certified producer groups, providing advance purchase agreements, agronomic support, and fair floor prices regardless of commodity market fluctuations.",
 
     "We also operate a premium leather goods division, drawing on Ethiopia's exceptional livestock sector and deep craft heritage to bring export-quality leather products to the international market.",
 
-    "With headquarters in Saluda, South Carolina and operations based in Addis Ababa, Ethiopia, KIJIJ International bridges two continents and a world of opportunity — delivering African excellence directly to global buyers.",
+    "With headquarters in Saluda, South Carolina and operations based in Addis Ababa, Ethiopia, KIJIJ  bridges two continents and a world of opportunity — delivering African excellence directly to global buyers.",
   ],
 
   foundingStory: {
     year: 2019,
     headline: "Products, Not Just Opportunities",
-    body: "KIJIJ International was founded on the conviction that Africa's greatest exports aren't ideas or potential — they're real products. A 1-ton trial shipment of washed Yirgacheffe Grade 1 coffee to a US roastery was the first proof of concept. It landed with a cupping score of 87.5, and three more container orders followed before the next harvest season. That first relationship taught our founders everything: quality speaks, consistency builds trust, and the world wants what Africa grows.",
+    body: "KIJIJ  was founded on the conviction that Africa's greatest exports aren't ideas or potential — they're real products. A 1-ton trial shipment of washed Yirgacheffe Grade 1 coffee to a US roastery was the first proof of concept. It landed with a cupping score of 87.5, and three more container orders followed before the next harvest season. That first relationship taught our founders everything: quality speaks, consistency builds trust, and the world wants what Africa grows.",
   },
 
   stats: [
@@ -67,11 +67,11 @@ export const NEWS_POSTS = [
     slug: "ethiopian-leather-goods-craft-and-use",
     title: "Artisanal Craft & Enduring Utility: The Resilience of Ethiopian Handcrafted Leather",
     date: "2024-11-08",
-    author: "KIJIJ International Leather Division",
+    author: "KIJIJ  Leather Division",
     excerpt:
       "Exploring how centuries-old Ethiopian tanning traditions and premium highland hides yield weather-resilient travel weekenders, executive folios, and everyday carry built for lifelong durability.",
     body: [
-      "Ethiopia's unique geography and pastoral heritage produce some of the world's most supple and durable hides, particularly high-altitude sheepskin and full-grain cowhides. At KIJIJ International, our leather goods line focuses on utilitarian luxury — crafting products that don't merely look handsome on day one, but develop rich natural patinas and resilience across years of frequent international travel and daily professional use.",
+      "Ethiopia's unique geography and pastoral heritage produce some of the world's most supple and durable hides, particularly high-altitude sheepskin and full-grain cowhides. At KIJIJ , our leather goods line focuses on utilitarian luxury — crafting products that don't merely look handsome on day one, but develop rich natural patinas and resilience across years of frequent international travel and daily professional use.",
       "From reinforced travel weekender bags engineered to fit international overhead compartments, to minimalist cardholders and weather-sealed briefcases, each piece is hand-stitched by skilled Ethiopian artisans. By combining traditional vegetable-tanning processes with modern hardware and reinforced stress points, we deliver functional leather companions suited for international executives, creatives, and discerning travelers.",
     ],
     image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=800&q=80",
@@ -93,9 +93,9 @@ export const NEWS_POSTS = [
   },
   {
     slug: "scaa-expo-2024",
-    title: "KIJIJ International at the 2024 Specialty Coffee Expo, Chicago",
+    title: "KIJIJ  at the 2024 Specialty Coffee Expo, Chicago",
     date: "2024-04-22",
-    author: "KIJIJ International Team",
+    author: "KIJIJ  Team",
     excerpt:
       "Our team attended the Specialty Coffee Association Expo in Chicago, where we connected with more than 40 prospective buyers and hosted cupping sessions of our full 2024 harvest lineup.",
     body: [

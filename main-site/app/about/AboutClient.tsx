@@ -17,15 +17,15 @@ export default function AboutClient() {
         'በሳሉዳ፣ ደቡብ ካሮላይና ባለው ዋና መሥሪያ ቤታችን እና በአዲስ አበባ ባለው የስራ ማዕከላችን አማካኝነት ኪጂጅ ኢንተርናሽናል ሁለቱን አህጉራት በማስተሳሰር የአፍሪካን ምርጥነት በቀጥታ ለአለም አቀፍ ገዢዎች ያደርሳል።',
       ]
     : [
-        "KIJIJ International LLC is a USA-registered company with operational roots in Ethiopia. We were founded on a simple but powerful belief: the world doesn't just need more opportunities — it needs more products. Real, high-quality African goods that speak for themselves and create lasting value across the supply chain.",
+        "KIJIJ  LLC is a USA-registered company with operational roots in Ethiopia. We were founded on a simple but powerful belief: the world doesn't just need more opportunities — it needs more products. Real, high-quality African goods that speak for themselves and create lasting value across the supply chain.",
         "Our flagship business is Ethiopian specialty coffee — sourced from the world's most celebrated growing regions including Yirgacheffe, Sidamo, and Guji. We work with smallholder farmers organized into certified producer groups, providing advance purchase agreements, agronomic support, and fair floor prices regardless of commodity market fluctuations.",
         "We also operate a premium leather goods division, drawing on Ethiopia's exceptional livestock sector and deep craft heritage to bring export-quality leather products to the international market.",
-        "With headquarters in Saluda, South Carolina and operations based in Addis Ababa, Ethiopia, KIJIJ International bridges two continents and a world of opportunity — delivering African excellence directly to global buyers.",
+        "With headquarters in Saluda, South Carolina and operations based in Addis Ababa, Ethiopia, KIJIJ  bridges two continents and a world of opportunity — delivering African excellence directly to global buyers.",
       ];
 
   const foundingStoryBody = isAmharic
     ? 'ኪጂጅ ኢንተርናሽናል የተመሰረተው የአፍሪካ ታላላቅ ኤክስፖርቶች ረቂቅ ሀሳቦች ወይም ባዶ አቅሞች ሳይሆኑ እውነተኛና ተጨባጭ ምርቶች ናቸው በሚል ጽኑ እምነት ነው። ለአሜሪካ የቡና ቆዪዎች የተላከው 1 ቶን የታጠበ ይርጋጨፌ ደረጃ 1 ቡና የመጀመሪያው ማረጋገጫችን ነበር። የ87.5 የቅምሻ ውጤት በማስመዝገብ፣ ከመቀጣዩ የመከር ወቅት በፊት ተጨማሪ የሶስት ኮንቴይነሮች ትዕዛዝ አስገኝቷል። ያ የመጀመሪያው ግንኙነት ሁሉንም አስተምሮናል፡ ጥራት ራሱን ይገልጻል፣ ወጥነት እምነትን ይገነባል፣ እና ዓለም አፍሪካ የምታመርተውን እውነተኛ ምርት ይፈልጋል።'
-    : 'KIJIJ International was founded on the conviction that Africa\'s greatest exports aren\'t ideas or potential — they\'re real products. A 1-ton trial shipment of washed Yirgacheffe Grade 1 coffee to a US roastery was the first proof of concept. It landed with a cupping score of 87.5, and three more container orders followed before the next harvest season. That first relationship taught our founders everything: quality speaks, consistency builds trust, and the world wants what Africa grows.';
+    : 'KIJIJ  was founded on the conviction that Africa\'s greatest exports aren\'t ideas or potential — they\'re real products. A 1-ton trial shipment of washed Yirgacheffe Grade 1 coffee to a US roastery was the first proof of concept. It landed with a cupping score of 87.5, and three more container orders followed before the next harvest season. That first relationship taught our founders everything: quality speaks, consistency builds trust, and the world wants what Africa grows.';
 
   const missionText = isAmharic
     ? 'ከፍተኛ ጥራት ያላቸውን ምርቶች በግልጽነት፣ በታማኝነት እና በጥንቃቄ በማቅረብ ለአፍሪካ አምራቾች እና ለዓለም አቀፍ ገዢዎች ዘላቂ እና የረጅም ጊዜ እሴት መፍጠር።'
@@ -88,7 +88,7 @@ export default function AboutClient() {
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1920&q=85"
-            alt="KIJIJ International — Global maritime export logistics and container shipping"
+            alt="KIJIJ  — Global maritime export logistics and container shipping"
             fill
             className="object-cover opacity-15 filter brightness-75"
             priority

@@ -33,6 +33,14 @@ export default function SettingsPage() {
   );
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab') as Tab;
+    if (tabParam && ['profile', 'companies', 'addresses', 'requests'].includes(tabParam)) {
+      setActiveTab(tabParam);
+      if (tabParam === 'companies') setShowAddCompany(true);
+      if (tabParam === 'addresses') setShowAddAddress(true);
+    }
+
     const fetchUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -219,8 +227,16 @@ export default function SettingsPage() {
                           <input type="text" required value={newCompany.country} onChange={e => setNewCompany(prev => ({ ...prev, country: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-neutral-700 mb-1">VAT Number</label>
-                          <input type="text" value={newCompany.vat} onChange={e => setNewCompany(prev => ({ ...prev, vat: e.target.value }))} className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500" />
+                          <label className="block text-xs font-medium text-neutral-700 mb-1">
+                            VAT Number <span className="text-neutral-400 font-normal">(Optional)</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newCompany.vat}
+                            onChange={(e) => setNewCompany((prev) => ({ ...prev, vat: e.target.value }))}
+                            className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500"
+                            placeholder="e.g. US123456789 (Optional)"
+                          />
                         </div>
                       </div>
                       <button type="submit" disabled={updating} className="w-full bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary-800 disabled:opacity-50">

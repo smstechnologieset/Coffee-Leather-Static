@@ -18,14 +18,14 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Highland Roots Coffee Trading — Premium Ethiopian Specialty Coffee",
-    template: "%s | Highland Roots Coffee",
+    default: "KIJIJ Coffee — Premium Ethiopian Specialty Coffee",
+    template: "%s | KIJIJ Coffee",
   },
   description:
-    "Source premium specialty coffee direct from Ethiopia's highland farms. Request samples, negotiate contracts, and build lasting B2B supply-chain partnerships with Highland Roots Trading PLC.",
-  keywords: ["Ethiopian coffee", "specialty coffee", "B2B coffee trading", "Yirgacheffe", "Sidamo", "coffee export"],
+    "Source premium specialty coffee direct from Ethiopia's highland farms. Request samples, negotiate contracts, and build lasting B2B supply-chain partnerships with KIJIJ Coffee, a division of KIJIJ International LLC.",
+  keywords: ["Ethiopian coffee", "specialty coffee", "B2B coffee trading", "Yirgacheffe", "Sidamo", "coffee export", "KIJIJ Coffee"],
   openGraph: {
-    siteName: "Highland Roots Coffee Trading",
+    siteName: "KIJIJ Coffee",
     type: "website",
   },
 };

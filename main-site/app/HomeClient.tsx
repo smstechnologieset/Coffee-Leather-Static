@@ -59,7 +59,7 @@ export default function HomeClient() {
         <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1920&q=85"
-            alt="KIJIJ International — Global container export logistics and maritime trade"
+            alt="KIJIJ  — Global container export logistics and maritime trade"
             fill
             className="object-cover opacity-20 filter contrast-125 brightness-90"
             priority

@@ -31,7 +31,7 @@ export default function CompanyIntro() {
         <div className="text-center mb-14">
           <h2 className="text-base text-primary-600 font-semibold tracking-widest uppercase mb-2">About Our Company</h2>
           <p className="text-3xl sm:text-4xl font-serif font-bold text-neutral-900">
-            Welcome to Highland Roots Trading PLC
+            Welcome to KIJIJ Coffee
           </p>
         </div>
 
@@ -39,8 +39,8 @@ export default function CompanyIntro() {
           {/* Image */}
           <div className="relative h-96 rounded-2xl overflow-hidden shadow-brand-lg">
             <Image
-              src="https://images.unsplash.com/photo-1611078489935-0cb964de46d6?w=900&q=85"
-              alt="Ethiopian coffee cooperative"
+              src="https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=900&q=85"
+              alt="Harvest of ripe red Ethiopian coffee cherries"
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -55,7 +55,7 @@ export default function CompanyIntro() {
           {/* Text + features */}
           <div>
             <p className="text-lg text-neutral-600 leading-relaxed">
-              Established with a vision to bridge global markets, Highland Roots Trading PLC has emerged 
+              Established with a vision to bridge global markets, KIJIJ Coffee has emerged 
               as a trusted partner in Ethiopian specialty coffee export. With deep roots in the Ethiopian 
               highlands, we specialize in connecting smallholder cooperatives with premium international buyers.
             </p>

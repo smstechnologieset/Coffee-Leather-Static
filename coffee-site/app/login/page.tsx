@@ -46,13 +46,36 @@ export default function LoginPage() {
       if (isLogin) {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
-        router.push('/coffees');
+
+        const isUserAdmin = email.trim().toLowerCase() === 'admin@mixed.com';
+        if (isUserAdmin) {
+          try {
+            await supabase.auth.updateUser({
+              data: { role: 'admin' }
+            });
+          } catch (e) {
+            console.error('Failed to update admin role in metadata', e);
+          }
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        let redirectUrl = params.get('redirect') || params.get('redirect_to');
+        if (!redirectUrl) {
+          redirectUrl = isUserAdmin ? '/admin' : '/coffees';
+        }
+        router.push(redirectUrl);
         router.refresh();
       } else {
+        const isUserAdmin = email.trim().toLowerCase() === 'admin@mixed.com';
         const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: name || email.split('@')[0] } },
+          options: {
+            data: {
+              full_name: name || email.split('@')[0],
+              role: isUserAdmin ? 'admin' : 'user',
+            }
+          },
         });
         if (signUpError) throw signUpError;
         setVerificationSent(true);
@@ -127,8 +150,8 @@ export default function LoginPage() {
               <Coffee className="h-6 w-6 text-amber-300" />
             </div>
             <div>
-              <p className="text-white font-bold text-lg leading-none">Highland Roots</p>
-              <p className="text-primary-300 text-xs">Coffee Trading PLC</p>
+              <p className="text-white font-bold text-lg leading-none">KIJIJ Coffee</p>
+              <p className="text-primary-300 text-xs">Specialty Coffee Trading</p>
             </div>
           </div>
           <h2 className="text-4xl font-serif font-bold text-white mb-4">

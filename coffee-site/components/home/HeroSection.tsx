@@ -64,7 +64,7 @@ export default function HeroSection() {
 
           {/* Subheadline */}
           <p className="text-xl text-white/80 max-w-2xl mx-auto mb-10 animate-fadeIn">
-            Highland Roots Trading PLC connects premium Ethiopian coffee producers
+            KIJIJ Coffee connects premium Ethiopian coffee producers
             with international buyers through transparent, traceable supply chains.
           </p>
 

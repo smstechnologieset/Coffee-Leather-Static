@@ -38,23 +38,23 @@ export default async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/checkout') ||
     request.nextUrl.pathname.includes('/request-');
 
-  // If logged in and trying to access login page, redirect to catalog
+  // If logged in and trying to access login page, redirect to catalog (or /admin for admins)
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/coffees', request.url));
+    const isAdmin = user.email?.toLowerCase() === 'admin@mixed.com' || user.user_metadata?.role === 'admin';
+    return NextResponse.redirect(new URL(isAdmin ? '/admin' : '/coffees', request.url));
   }
 
   // If not logged in and trying to access protected route, redirect to login
   if (isProtectedRoute && !user) {
     const redirectUrl = new URL('/login', request.url);
-    // Optionally preserve the intended destination
-    redirectUrl.searchParams.set('redirect_to', request.nextUrl.pathname);
+    redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Optional: check for admin role for /admin routes
+  // Check for admin role for /admin routes
   if (request.nextUrl.pathname.startsWith('/admin') && user) {
-    const role = user.user_metadata?.role;
-    if (role !== 'admin') {
+    const isAdmin = user.email?.toLowerCase() === 'admin@mixed.com' || user.user_metadata?.role === 'admin';
+    if (!isAdmin) {
       return NextResponse.redirect(new URL('/coffees', request.url));
     }
   }

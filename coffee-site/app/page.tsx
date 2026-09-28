@@ -3,13 +3,12 @@ import ProductsStrip from '@/components/home/ProductsStrip';
 import CompanyIntro from '@/components/home/CompanyIntro';
 import PurposeSection from '@/components/home/PurposeSection';
 import ContractCTA from '@/components/home/ContractCTA';
-import NewsPreview from '@/components/home/NewsPreview';
 import ContactTeaser from '@/components/home/ContactTeaser';
 
 export const metadata = {
-  title: 'Highland Roots Coffee Trading — Premium Ethiopian Specialty Coffee',
+  title: 'KIJIJ Coffee — Premium Ethiopian Specialty Coffee',
   description:
-    'Source premium specialty coffee direct from Ethiopia\'s highland farms. Request samples, negotiate contracts, and build lasting supply-chain partnerships.',
+    'Source premium specialty coffee direct from Ethiopia\'s highland farms. Request samples, negotiate contracts, and build lasting supply-chain partnerships with KIJIJ Coffee.',
 };
 
 export default function HomePage() {
@@ -20,7 +19,6 @@ export default function HomePage() {
       <CompanyIntro />
       <PurposeSection />
       <ContractCTA />
-      <NewsPreview />
       <ContactTeaser />
     </main>
   );

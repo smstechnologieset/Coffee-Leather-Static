@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Upload } from 'lucide-react';
 
 const MOCK_CONTRACTS = [
-  { id: 'cr1', productName: 'Yirgacheffe Grade 1 Washed', companyName: 'Nordic Roasters AB', contact: 'Erik Johansson', email: 'erik@nordicr.se', quantity: 5, incoterms: 'FOB Addis Ababa', totalValue: 21000, status: 'pending_payment', date: '2026-09-13', deliveryWindow: '60 days' },
-  { id: 'cr2', productName: 'Guji Zone Natural G1', companyName: 'Blue Bottle Coffee', contact: 'Sara Lee', email: 'sara@bluebottle.com', quantity: 10, incoterms: 'CIF Destination Port', totalValue: 49000, status: 'paid_pending_contract', date: '2026-09-10', deliveryWindow: '90 days' },
-  { id: 'cr3', productName: 'Harar Longberry Natural', companyName: 'Tokyo Coffee Supply', contact: 'Kenji Sato', email: 'kenji@tokyocoffee.jp', quantity: 3, incoterms: 'FOB Addis Ababa', totalValue: 13800, status: 'contract_sent', date: '2026-09-05', deliveryWindow: '30 days' },
+  { id: 'cr1', productName: 'Yirgacheffe Grade 1 Washed', companyName: 'Nordic Roasters AB', contact: 'Erik Johansson', email: 'erik@nordicr.se', quantity: 5, totalValue: 21000, status: 'pending_payment', date: '2026-09-13', deliveryWindow: '60 days' },
+  { id: 'cr2', productName: 'Guji Zone Natural G1', companyName: 'Blue Bottle Coffee', contact: 'Sara Lee', email: 'sara@bluebottle.com', quantity: 10, totalValue: 49000, status: 'paid_pending_contract', date: '2026-09-10', deliveryWindow: '90 days' },
+  { id: 'cr3', productName: 'Harar Longberry Natural', companyName: 'Tokyo Coffee Supply', contact: 'Kenji Sato', email: 'kenji@tokyocoffee.jp', quantity: 3, totalValue: 13800, status: 'contract_sent', date: '2026-09-05', deliveryWindow: '30 days' },
 ];
 
 const STATUS_FLOW = ['pending_payment', 'paid_pending_contract', 'contract_sent', 'closed'];
@@ -65,7 +65,6 @@ export default function ContractRequestsSection() {
                     ['Contact', contract.contact],
                     ['Email', contract.email],
                     ['Quantity', `${contract.quantity} MT`],
-                    ['Incoterms', contract.incoterms],
                     ['Delivery', contract.deliveryWindow],
                     ['Total Value', `$${contract.totalValue.toLocaleString()}`],
                   ].map(([label, value]) => (

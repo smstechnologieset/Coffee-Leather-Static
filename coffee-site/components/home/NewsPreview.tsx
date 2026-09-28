@@ -15,7 +15,7 @@ const NEWS = [
   {
     id: '2',
     title: 'New Q-Grader Certifications Strengthen Our Quality Assurance Program',
-    excerpt: 'Highland Roots now has three SCA-certified Q-Graders on staff, ensuring every lot meets international specialty standards before it leaves the warehouse.',
+    excerpt: 'KIJIJ Coffee now has three SCA-certified Q-Graders on staff, ensuring every lot meets international specialty standards before it leaves the warehouse.',
     date: 'Sept 3, 2026',
     category: 'Company News',
     image: 'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&q=80',

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_CONFIG.companyName}`,
   },
   description:
-    'KIJIJ International LLC delivers the finest Ethiopian specialty coffees and premium handcrafted leather goods to clients worldwide — selling products, not just opportunities.',
+    'KIJIJ  LLC delivers the finest Ethiopian specialty coffees and premium handcrafted leather goods to clients worldwide — selling products, not just opportunities.',
   openGraph: {
     type: 'website',
     siteName: SITE_CONFIG.companyName,

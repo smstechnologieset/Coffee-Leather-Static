@@ -35,7 +35,7 @@ export default function OverviewSection({ stats, onNavigate }: { stats: Stats; o
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-serif font-bold text-neutral-900">Dashboard Overview</h1>
-          <p className="text-neutral-500 text-sm mt-1">Highland Roots Coffee Trading — Admin View</p>
+          <p className="text-neutral-500 text-sm mt-1">KIJIJ Coffee — Admin View</p>
         </div>
       </div>
 
