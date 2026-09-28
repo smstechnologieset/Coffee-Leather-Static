@@ -20,6 +20,7 @@ import {
 import { createBrowserClient } from '@supabase/ssr';
 import { SampleTier, DEFAULT_SAMPLE_TIERS, getStoredProduct } from '@/lib/products-data';
 import StripeTestModal from '@/components/StripeTestModal';
+import { saveUserRequest } from '@/lib/requests-data';
 
 // Static coffee fallback data with Quintal/kg pricing and sample tiers in grams/kg
 const COFFEES: Record<string, any> = {
@@ -228,6 +229,35 @@ export default function RequestSamplePage() {
     fetchUser();
   }, []);
 
+  // Handle return redirect from official Stripe Hosted Checkout
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('payment_success') === 'true') {
+        const sid = sp.get('session_id') || `cs_test_${Date.now()}`;
+        setPaymentResult({
+          transactionId: sid,
+          last4: '4242',
+        });
+        setShowSuccess(true);
+
+        try {
+          const raw = sessionStorage.getItem('pending_sample_request');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            saveUserRequest({
+              ...parsed,
+              status: 'Paid / Processing',
+              paymentStatus: 'paid',
+              stripeTransactionId: sid,
+            });
+            sessionStorage.removeItem('pending_sample_request');
+          }
+        } catch (e) {}
+      }
+    }
+  }, []);
+
   const handleCompanySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
     setSelectedCompanyId(id);
@@ -296,6 +326,7 @@ export default function RequestSamplePage() {
     try {
       const sampleRecord = {
         id: `sr_${Date.now()}`,
+        type: 'sample' as const,
         productId,
         productName: coffee.name,
         companyName: formData.companyName,
@@ -309,11 +340,16 @@ export default function RequestSamplePage() {
         isFree: selectedTier.isFree || selectedTier.price === 0,
         deliveryMethod: formData.deliveryMethod,
         notes: formData.notes,
-        status: stripeTxId ? 'sample_paid' : 'new',
+        status: stripeTxId ? 'Paid / Processing' : (selectedTier.isFree ? 'Complimentary Approved' : 'New'),
         paymentStatus: stripeTxId ? 'paid' : (selectedTier.isFree ? 'complimentary' : 'pending'),
         stripeTransactionId: stripeTxId || null,
         createdAt: new Date().toISOString(),
       };
+
+      saveUserRequest(sampleRecord);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pending_sample_request', JSON.stringify(sampleRecord));
+      }
 
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -929,6 +965,12 @@ export default function RequestSamplePage() {
         title={`${coffee.name} (${selectedTier.size})`}
         subtitle="Green Coffee Roaster Sample Evaluation Package"
         companyName={formData.companyName || 'Buyer Company'}
+        productId={productId}
+        type="sample"
+        customerEmail={formData.email}
+        deliveryAddress={`${formData.address}, ${formData.city}, ${formData.country}`}
+        sampleSize={selectedTier.size}
+        notes={formData.notes}
       />
     </>
   );

@@ -26,13 +26,14 @@ export async function POST(request: Request) {
     if (hasLiveOrTestKey) {
       const stripe = new Stripe(secretKey);
 
+      const sizeLabel = sampleSize ? ` (${sampleSize})` : '';
       const title = type === 'sample'
-        ? `Coffee Sample: ${productName} (${sampleSize})`
-        : `Contract Deposit: ${quantityQuintals} Quintals of ${productName}`;
+        ? (productName.includes('(') ? `Coffee Sample: ${productName}` : `Coffee Sample: ${productName}${sizeLabel}`)
+        : `Contract Deposit: ${quantityQuintals || '10'} Quintals of ${productName}`;
 
       const description = type === 'sample'
-        ? `Roaster sample request evaluation package (${sampleSize}) for ${companyName}`
-        : `Initial contract reserve deposit for ${companyName} (${deliveryAddress})`;
+        ? `Roaster sample evaluation package${sizeLabel} for ${companyName || 'Buyer'}`
+        : `Initial contract reserve deposit for ${companyName || 'Buyer'}${deliveryAddress ? ` (${deliveryAddress})` : ''}`;
 
       const baseOrigin = origin || SITE_CONFIG.urls.coffeeSite;
 

@@ -21,6 +21,7 @@ import {
 import { createBrowserClient } from '@supabase/ssr';
 import StripeTestModal from '@/components/StripeTestModal';
 import { getStoredProduct } from '@/lib/products-data';
+import { saveUserRequest } from '@/lib/requests-data';
 
 // Static fallback coffee data with Quintal/kg pricing (1 Quintal = 100 kg)
 const COFFEES: Record<string, any> = {
@@ -138,6 +139,7 @@ export default function RequestContractPage() {
   const [error, setError] = useState('');
   const [showStripeModal, setShowStripeModal] = useState(false);
   const [paymentResult, setPaymentResult] = useState<{ transactionId: string; last4: string } | null>(null);
+  const [paymentOption, setPaymentOption] = useState<'deposit' | 'full'>('deposit');
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -207,6 +209,36 @@ export default function RequestContractPage() {
     fetchUser();
   }, []);
 
+  // Handle return redirect from official Stripe Hosted Checkout
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('payment_success') === 'true') {
+        const sid = sp.get('session_id') || `cs_test_${Date.now()}`;
+        setPaymentResult({
+          transactionId: sid,
+          last4: '4242',
+        });
+        setShowSuccess(true);
+
+        // Check if there was pending contract data saved in sessionStorage
+        try {
+          const raw = sessionStorage.getItem('pending_contract_request');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            saveUserRequest({
+              ...parsed,
+              status: parsed.paymentOption === 'full' ? 'Full Payment Secured' : 'Deposit Secured (5%)',
+              paymentStatus: parsed.paymentOption === 'full' ? 'paid_in_full' : 'deposit_secured',
+              stripeTransactionId: sid,
+            });
+            sessionStorage.removeItem('pending_contract_request');
+          }
+        } catch (e) {}
+      }
+    }
+  }, []);
+
   const handleCompanySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const id = e.target.value;
     setSelectedCompanyId(id);
@@ -266,6 +298,7 @@ export default function RequestContractPage() {
   const totalValue = formData.quantity * coffee.pricePerQuintal;
   // Standard earnest deposit for contract locking (5%, minimum $250)
   const depositAmount = Math.max(250, Math.round(totalValue * 0.05));
+  const payableAmount = paymentOption === 'full' ? totalValue : depositAmount;
 
   const update = (field: string, value: any) =>
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -283,6 +316,7 @@ export default function RequestContractPage() {
     try {
       const contractRecord = {
         id: `ct_${Date.now()}`,
+        type: 'contract' as const,
         productId,
         productName: coffee.name,
         companyName: formData.companyName,
@@ -296,14 +330,25 @@ export default function RequestContractPage() {
         quantityKg: totalKg,
         pricePerQuintal: coffee.pricePerQuintal,
         totalValue,
-        depositAmount,
+        depositAmount: payableAmount,
+        paymentOption,
         deliveryWindow: formData.deliveryWindow,
         notes: formData.notes,
-        status: stripeTxId ? 'deposit_paid' : 'under_review',
-        paymentStatus: stripeTxId ? 'deposit_secured' : 'pending_deposit',
+        status: stripeTxId
+          ? (paymentOption === 'full' ? 'Full Payment Secured' : 'Deposit Secured (5%)')
+          : 'Under Review',
+        paymentStatus: stripeTxId
+          ? (paymentOption === 'full' ? 'paid_in_full' : 'deposit_secured')
+          : 'pending_deposit',
         stripeTransactionId: stripeTxId || null,
         createdAt: new Date().toISOString(),
       };
+
+      // Save to persistent requests store
+      saveUserRequest(contractRecord);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pending_contract_request', JSON.stringify(contractRecord));
+      }
 
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -803,6 +848,68 @@ export default function RequestContractPage() {
                     />
                   </div>
 
+                  {/* Payment Structure Choice */}
+                  <div className="bg-white rounded-2xl border border-neutral-200 p-5 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-bold text-neutral-900 text-sm">Payment Structure</h3>
+                      <span className="text-xs text-neutral-500 font-medium">Select payment amount</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* 5% Booking Deposit Option */}
+                      <button
+                        type="button"
+                        onClick={() => setPaymentOption('deposit')}
+                        className={`p-4 rounded-xl border text-left transition-all ${
+                          paymentOption === 'deposit'
+                            ? 'border-primary-600 bg-primary-50/60 ring-2 ring-primary-600/20'
+                            : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-primary-800">
+                            5% Booking Deposit (Recommended)
+                          </span>
+                          {paymentOption === 'deposit' && (
+                            <CheckCircle2 className="h-4 w-4 text-primary-600 shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xl font-bold font-mono text-neutral-900">
+                          ${depositAmount.toLocaleString()} USD
+                        </p>
+                        <p className="text-[11px] text-neutral-500 mt-1 leading-relaxed">
+                          Standard commercial B2B lot reservation. Locks pricing and allocation; remainder paid via wire transfer / L/C upon Bill of Lading.
+                        </p>
+                      </button>
+
+                      {/* 100% Full Payment Option */}
+                      <button
+                        type="button"
+                        onClick={() => setPaymentOption('full')}
+                        className={`p-4 rounded-xl border text-left transition-all ${
+                          paymentOption === 'full'
+                            ? 'border-primary-600 bg-primary-50/60 ring-2 ring-primary-600/20'
+                            : 'border-neutral-200 hover:border-neutral-300 bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-700">
+                            100% Full Payment
+                          </span>
+                          {paymentOption === 'full' && (
+                            <CheckCircle2 className="h-4 w-4 text-primary-600 shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xl font-bold font-mono text-neutral-900">
+                          ${totalValue.toLocaleString()} USD
+                        </p>
+                        <p className="text-[11px] text-neutral-500 mt-1 leading-relaxed">
+                          Pay the complete contract amount upfront now.
+                        </p>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Live Contract Value & Earnest Deposit Breakdown */}
                   <div className="bg-neutral-900 text-white rounded-2xl p-5 shadow-md space-y-3">
                     <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
@@ -829,7 +936,7 @@ export default function RequestContractPage() {
                       <div className="bg-emerald-950/80 border border-emerald-500/50 p-2.5 rounded-xl flex items-center justify-between text-xs text-emerald-300">
                         <span className="flex items-center gap-1.5 font-semibold">
                           <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                          Earnest Deposit Paid via Stripe Test Mode
+                          {paymentOption === 'full' ? 'Full Contract Paid via Stripe Test Mode' : 'Earnest Deposit Paid via Stripe Test Mode'}
                         </span>
                         <span className="font-mono text-[11px] text-emerald-400/90">{paymentResult.transactionId}</span>
                       </div>
@@ -838,12 +945,12 @@ export default function RequestContractPage() {
                     <div className="pt-2 border-t border-neutral-800 flex items-center justify-between">
                       <div className="flex items-center gap-1.5 text-xs text-neutral-400">
                         <CreditCard className="h-3.5 w-3.5 text-indigo-400" />
-                        <span>5% Earnest Allocation Deposit (Stripe Test Mode)</span>
+                        <span>{paymentOption === 'full' ? '100% Full Contract Balance' : '5% Earnest Allocation Deposit'}</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-xs text-neutral-400 mr-2">Deposit Due:</span>
+                        <span className="text-xs text-neutral-400 mr-2">Amount Due:</span>
                         <span className="text-lg font-mono font-extrabold text-white">
-                          ${depositAmount.toLocaleString()} USD
+                          ${payableAmount.toLocaleString()} USD
                         </span>
                       </div>
                     </div>
@@ -859,14 +966,16 @@ export default function RequestContractPage() {
                     ) : !paymentResult ? (
                       <>
                         <CreditCard className="h-4 w-4" />
-                        <span>Pay Earnest Deposit (${depositAmount.toLocaleString()}) & Initiate Contract · Stripe Test Mode</span>
+                        <span>Pay ${payableAmount.toLocaleString()} ({paymentOption === 'full' ? 'Full Contract' : '5% Deposit'}) · Stripe Test Mode</span>
                       </>
                     ) : (
                       <span>Confirm Contract Allocation ({formData.quantity} Quintals)</span>
                     )}
                   </button>
                   <p className="text-xs text-neutral-400 text-center">
-                    Earnest deposit secures coffee lot reservation in Addis Ababa export warehouse.
+                    {paymentOption === 'deposit'
+                      ? '5% Earnest deposit secures coffee lot reservation in Addis Ababa export warehouse.'
+                      : 'Full contract payment securely processed via Stripe Test Mode.'}
                   </p>
                 </form>
               )}
@@ -926,10 +1035,16 @@ export default function RequestContractPage() {
         isOpen={showStripeModal}
         onClose={() => setShowStripeModal(false)}
         onSuccess={handleStripeSuccess}
-        amount={depositAmount}
+        amount={payableAmount}
         title={`${coffee.name} — Supply Contract`}
-        subtitle={`5% Earnest Booking Deposit for ${formData.quantity} Quintals (${totalKg.toLocaleString()} kg)`}
+        subtitle={`${paymentOption === 'full' ? '100% Full Payment' : '5% Booking Deposit'} for ${formData.quantity} Quintals (${totalKg.toLocaleString()} kg)`}
         companyName={formData.companyName || 'Buyer Company'}
+        productId={productId}
+        type="contract"
+        customerEmail={formData.email}
+        deliveryAddress={`${formData.address}, ${formData.city}, ${formData.country}`}
+        quantityQuintals={Number(formData.quantity) || 10}
+        notes={formData.notes}
       />
     </>
   );
