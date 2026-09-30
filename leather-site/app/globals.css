@@ -23,6 +23,21 @@
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
+  /* Marquee animation */
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 24s linear infinite;
+    display: flex;
+    width: max-content;
+  }
+
+  /* Extra scale utility */
+  .group-hover\:scale-108:hover { transform: scale(1.08); }
+  .group:hover .group-hover\:scale-108 { transform: scale(1.08); }
+
   /* Custom scrollbar for light panels */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: #f4f5f5; }

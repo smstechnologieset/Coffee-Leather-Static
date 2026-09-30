@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ShoppingBag, Truck, Check } from 'lucide-react';
+import { ShoppingBag, Check } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { LeatherProduct } from '@/lib/leather-data';
 
@@ -12,12 +12,12 @@ export default function AddToCartForm({ product }: { product: LeatherProduct }) 
 
   const handleAddToCart = () => {
     addItem({
-      id: `${product.id}-${selectedColor}${selectedSize ? `-${selectedSize}` : ''}`,
+      id: `${product.id}-${selectedColor.name}${selectedSize ? `-${selectedSize}` : ''}`,
       productId: product.id,
       name: product.name,
       price: product.price,
       image: product.images[0],
-      color: selectedColor,
+      color: selectedColor.name,
       size: selectedSize,
       quantity: 1,
     });
@@ -28,22 +28,23 @@ export default function AddToCartForm({ product }: { product: LeatherProduct }) 
       {/* Colors */}
       {product.colors && product.colors.length > 0 && (
         <div className="mb-6">
-          <h3 className="text-sm text-neutral-900 font-medium mb-3">Color</h3>
+          <h3 className="text-sm text-neutral-900 font-medium mb-3">
+            Colour: <span className="font-semibold">{selectedColor.name}</span>
+          </h3>
           <div className="flex items-center gap-3">
             {product.colors.map((color) => (
-              <label key={color} className="relative cursor-pointer">
-                <input
-                  type="radio"
-                  name="color"
-                  value={color}
-                  className="peer sr-only"
-                  checked={selectedColor === color}
-                  onChange={() => setSelectedColor(color)}
-                />
-                <span className="block px-4 py-2 text-sm font-medium border border-neutral-200 rounded-md peer-checked:border-accent-700 peer-checked:bg-accent-50 transition-colors">
-                  {color}
-                </span>
-              </label>
+              <button
+                key={color.name}
+                type="button"
+                title={color.name}
+                onClick={() => setSelectedColor(color)}
+                className={`w-7 h-7 rounded-full border-2 transition-all ${
+                  selectedColor.name === color.name
+                    ? 'border-neutral-900 scale-110 shadow'
+                    : 'border-neutral-300 hover:border-neutral-500'
+                }`}
+                style={{ backgroundColor: color.hex }}
+              />
             ))}
           </div>
         </div>
@@ -84,10 +85,6 @@ export default function AddToCartForm({ product }: { product: LeatherProduct }) 
       >
         <ShoppingBag className="h-5 w-5" /> Add to Cart
       </button>
-
-      <div className="flex items-center justify-center gap-2 text-sm text-neutral-500 mb-8">
-        <Truck className="h-4 w-4" /> Free worldwide shipping
-      </div>
 
       <div className="border-t border-neutral-200 pt-8">
         <h3 className="text-sm font-bold text-neutral-900 mb-4 uppercase tracking-wider">
