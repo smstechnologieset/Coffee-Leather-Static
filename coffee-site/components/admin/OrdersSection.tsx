@@ -22,6 +22,7 @@ import {
 import {
   DirectOrder,
   getDirectOrders,
+  fetchDirectOrdersFromDb,
   updateDirectOrderStatus,
 } from '@/lib/direct-orders-data';
 
@@ -36,18 +37,26 @@ export default function OrdersSection() {
   const [carrier, setCarrier] = useState('');
   const [trackingNumber, setTrackingNumber] = useState('');
 
-  const loadOrders = () => {
+  const loadOrders = async () => {
     const list = getDirectOrders();
     setOrders(list);
+    try {
+      const dbList = await fetchDirectOrdersFromDb();
+      if (dbList && dbList.length > 0) {
+        setOrders(dbList);
+      }
+    } catch (e) {
+      console.warn('Could not sync orders from db:', e);
+    }
   };
 
   useEffect(() => {
     loadOrders();
-    window.addEventListener('kijij_direct_orders_updated', loadOrders);
-    window.addEventListener('storage', loadOrders);
+    window.addEventListener('kijij_direct_orders_updated', () => setOrders(getDirectOrders()));
+    window.addEventListener('storage', () => setOrders(getDirectOrders()));
     return () => {
-      window.removeEventListener('kijij_direct_orders_updated', loadOrders);
-      window.removeEventListener('storage', loadOrders);
+      window.removeEventListener('kijij_direct_orders_updated', () => setOrders(getDirectOrders()));
+      window.removeEventListener('storage', () => setOrders(getDirectOrders()));
     };
   }, []);
 
@@ -261,9 +270,9 @@ export default function OrdersSection() {
                     <td className="py-3.5 px-4 text-right whitespace-nowrap">
                       <button
                         onClick={() => handleOpenDetail(order)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-medium rounded-lg text-xs transition"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 font-semibold rounded-lg text-xs border border-neutral-300 transition-all shadow-xs"
                       >
-                        <Eye className="h-3.5 w-3.5 text-neutral-500" />
+                        <Eye className="h-3.5 w-3.5 text-neutral-600" />
                         <span>Manage</span>
                       </button>
                     </td>

@@ -46,7 +46,7 @@ export interface LeatherProduct {
 }
 
 // --- Storage Keys ---
-const STORAGE_KEY = 'kijij_leather_products_v1';
+const STORAGE_KEY = 'kijij_leather_products_v2';
 const ORDERS_KEY  = 'kijij_leather_orders_v1';
 const PROMOS_KEY  = 'kijij_leather_promos_v1';
 
@@ -75,7 +75,7 @@ export const INITIAL_LEATHER_PRODUCTS: LeatherProduct[] = [
     origin: 'Mojo Leather Tannery, Oromia Region',
     careInstructions: 'Condition every 3-6 months with a natural beeswax cream. Avoid prolonged exposure to direct sunlight. Store stuffed with tissue paper.',
     images: [
-      'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800&q=80',
+      '/images/highland-weekender.jpg',
       'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800&q=80',
     ],
     colors: [
@@ -317,7 +317,13 @@ export function getLeatherProducts(): LeatherProduct[] {
     }
     const parsed: LeatherProduct[] = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) return INITIAL_LEATHER_PRODUCTS;
-    return parsed;
+    // Sanitize any stale watch image references in cached localStorage
+    return parsed.map((p) => ({
+      ...p,
+      images: p.images.map((img) =>
+        img.includes('1547996160-81dfa63595aa') ? '/images/highland-weekender.jpg' : img
+      ),
+    }));
   } catch {
     return INITIAL_LEATHER_PRODUCTS;
   }
@@ -406,6 +412,59 @@ export function getLeatherOrders(): LeatherOrder[] {
   }
 }
 
+/** Asynchronously fetch live leather orders from Supabase */
+export async function fetchLeatherOrdersFromDb(): Promise<LeatherOrder[]> {
+  try {
+    const { createClient } = await import('./supabase');
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('site_source', 'leather')
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      return getLeatherOrders();
+    }
+
+    const mapped: LeatherOrder[] = data.map((row: any) => ({
+      id: row.id,
+      customerName: row.customer_name || 'Customer',
+      customerEmail: row.customer_email || '',
+      shippingAddress: row.shipping_address || { line1: '', city: '', country: '' },
+      items: Array.isArray(row.items) ? row.items.map((i: any) => ({
+        productId: i.productId || i.product_id || '',
+        productName: i.productName || i.product_name || i.name || 'Leather Item',
+        productImage: i.productImage || i.product_image || i.image || '',
+        color: i.color || 'Default',
+        size: i.size,
+        quantity: Number(i.quantity) || 1,
+        unitPrice: Number(i.unitPrice || i.unit_price || 0),
+      })) : [],
+      subtotal: Number(row.subtotal) || 0,
+      discountAmount: Number(row.discount_amount) || 0,
+      promoCode: row.promo_code || undefined,
+      total: Number(row.total_amount) || 0,
+      stripeSessionId: row.stripe_session_id || undefined,
+      status: (row.fulfillment_status as LeatherOrderStatus) || 'processing',
+      carrier: row.carrier || undefined,
+      trackingNumber: row.tracking_number || undefined,
+      createdAt: row.created_at || new Date().toISOString(),
+      updatedAt: row.updated_at || new Date().toISOString(),
+    }));
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(mapped));
+      window.dispatchEvent(new CustomEvent('kijij_leather_orders_updated', { detail: mapped }));
+    }
+
+    return mapped;
+  } catch (err) {
+    console.warn('Failed to fetch leather orders from Supabase:', err);
+    return getLeatherOrders();
+  }
+}
+
 export function saveLeatherOrder(order: LeatherOrder): LeatherOrder {
   if (typeof window === 'undefined') return order;
   const orders = getLeatherOrders();
@@ -445,6 +504,25 @@ export function updateLeatherOrderStatus(
     };
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
     window.dispatchEvent(new CustomEvent('kijij_leather_orders_updated', { detail: orders }));
+  }
+
+  // Sync to Supabase in background
+  try {
+    import('./supabase').then(({ createClient }) => {
+      const supabase = createClient();
+      supabase
+        .from('orders')
+        .update({
+          fulfillment_status: status,
+          carrier: carrier || null,
+          tracking_number: trackingNumber || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .then();
+    });
+  } catch (e) {
+    console.warn('Could not sync status to Supabase:', e);
   }
 }
 

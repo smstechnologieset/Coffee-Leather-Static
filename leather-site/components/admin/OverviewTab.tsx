@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import {
-  getLeatherProducts, getLeatherOrders, LeatherOrder,
+  getLeatherProducts, getLeatherOrders, fetchLeatherOrdersFromDb, LeatherOrder,
 } from '@/lib/leather-data';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -22,6 +22,9 @@ export default function OverviewTab() {
   const [orders, setOrders] = useState<LeatherOrder[]>(getLeatherOrders());
 
   useEffect(() => {
+    fetchLeatherOrdersFromDb().then((dbOrders) => {
+      if (dbOrders && dbOrders.length > 0) setOrders(dbOrders);
+    });
     const refresh = () => {
       setProducts(getLeatherProducts());
       setOrders(getLeatherOrders());

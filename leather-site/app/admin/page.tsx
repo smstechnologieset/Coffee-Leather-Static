@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   LayoutDashboard, Package, Tag, ShoppingBag,
-  Percent, FileText, BarChart3, ArrowLeft, Menu, X,
+  Percent, FileText, BarChart3, ArrowLeft, Menu, X, ShieldAlert,
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { createClient } from '@/lib/supabase';
 
 // Lazy-load heavy tab components
 const OverviewTab    = dynamic(() => import('@/components/admin/OverviewTab'),    { ssr: false });
@@ -28,8 +30,68 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
 ];
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          router.replace('/login?redirect=/admin');
+          return;
+        }
+
+        const email = user.email?.toLowerCase();
+        let authorized = email === 'admin@mixed.com';
+
+        // Check public.staff table in Supabase
+        const { data: staffMember } = await supabase
+          .from('staff')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (staffMember && (staffMember.role === 'admin' || staffMember.role === 'staff')) {
+          authorized = true;
+        }
+
+        if (!authorized) {
+          router.replace('/account');
+          return;
+        }
+
+        setIsAuthorized(true);
+      } catch (err) {
+        console.error('Admin auth check failed:', err);
+        router.replace('/account');
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    checkAdmin();
+  }, [router]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-neutral-50 gap-3">
+        <div className="h-8 w-8 border-2 border-neutral-900 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-mono uppercase tracking-widest text-neutral-500">
+          Verifying administrative authorization...
+        </p>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   const handleTabClick = (id: TabId) => {
     setActiveTab(id);
@@ -79,7 +141,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-neutral-50 overflow-hidden">
-
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex w-56 flex-shrink-0 flex-col bg-white border-r border-neutral-200">
         <Sidebar />
@@ -105,7 +166,6 @@ export default function AdminDashboard() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-
         {/* Top bar */}
         <header className="bg-white border-b border-neutral-200 px-4 sm:px-6 py-3 flex items-center gap-4 flex-shrink-0">
           <button

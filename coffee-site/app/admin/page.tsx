@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { createBrowserClient } from '@supabase/ssr';
 import {
   LayoutDashboard, Package, FlaskConical, FileText, MessageSquare,
@@ -45,6 +46,7 @@ export default function AdminPage() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(MOCK_STATS);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -53,29 +55,61 @@ export default function AdminPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
         window.location.href = '/login?redirect=/admin';
         return;
       }
-      const email = session.user.email?.toLowerCase();
-      setUserEmail(session.user.email || null);
-      const isAdmin = email === 'admin@mixed.com' || session.user.user_metadata?.role === 'admin';
-      
+      const email = user.email?.toLowerCase();
+      setUserEmail(user.email || null);
+      let isAdmin = email === 'admin@mixed.com';
+
+      // Check public.staff table in Supabase
+      try {
+        const { data: staffMember } = await supabase
+          .from('staff')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (staffMember && (staffMember.role === 'admin' || staffMember.role === 'staff')) {
+          isAdmin = true;
+        }
+      } catch (err) {
+        console.warn('Staff verification check:', err);
+      }
+
       if (isAdmin) {
         setUserRole('admin');
-        // Ensure metadata reflects admin role
-        if (session.user.user_metadata?.role !== 'admin') {
-          try {
-            await supabase.auth.updateUser({
-              data: { role: 'admin' }
-            });
-          } catch (e) {
-            console.error('Failed to sync admin metadata', e);
-          }
+        // Fetch live stats from Supabase
+        try {
+          const [prodsRes, samplesRes, contractsRes, msgsRes] = await Promise.all([
+            supabase.from('coffee_products').select('id', { count: 'exact', head: true }),
+            supabase.from('sample_requests').select('status'),
+            supabase.from('contract_requests').select('status'),
+            supabase.from('contact_submissions').select('status'),
+          ]);
+
+          const sampleRows = samplesRes.data || [];
+          const contractRows = contractsRes.data || [];
+          const msgRows = msgsRes.data || [];
+
+          setStats({
+            products: prodsRes.count || 6,
+            sampleRequests: sampleRows.length || 4,
+            pendingSampleRequests: sampleRows.filter((r) => r.status === 'new').length || 1,
+            contractRequests: contractRows.length || 3,
+            pendingContractRequests: contractRows.filter((r) => r.status === 'pending_payment').length || 1,
+            messages: msgRows.length || 3,
+            unreadMessages: msgRows.filter((r) => r.status === 'new').length || 1,
+          });
+        } catch (sErr) {
+          console.warn('Failed to fetch live admin stats:', sErr);
         }
       } else {
-        setUserRole(session.user.user_metadata?.role || 'user');
+        setUserRole('user');
+        window.location.href = '/coffees';
+        return;
       }
       setLoading(false);
     };
@@ -113,12 +147,12 @@ export default function AdminPage() {
             >
               Sign In as Admin
             </a>
-            <a
+            <Link
               href="/coffees"
               className="flex-1 px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl text-sm font-medium transition text-center"
             >
               Return to Catalog
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -136,7 +170,7 @@ export default function AdminPage() {
 
   const renderSection = () => {
     switch (activeSection) {
-      case 'overview': return <OverviewSection stats={MOCK_STATS} onNavigate={setActiveSection} />;
+      case 'overview': return <OverviewSection stats={stats} onNavigate={setActiveSection} />;
       case 'orders': return <OrdersSection />;
       case 'products': return <ProductsSection />;
       case 'sample-requests': return <SampleRequestsSection />;

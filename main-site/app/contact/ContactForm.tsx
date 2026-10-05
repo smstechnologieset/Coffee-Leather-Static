@@ -9,7 +9,7 @@ const initial: ContactFormState = { status: 'idle' };
 
 export default function ContactForm() {
   const [state, action, isPending] = useActionState(submitContactForm, initial);
-  const { t, isAmharic } = useLanguage();
+  const { isAmharic } = useLanguage();
 
   if (state.status === 'success') {
     return (

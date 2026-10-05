@@ -6,9 +6,9 @@
  */
 
 export const PRODUCTION_URLS = {
-  mainSite:    'https://kijij-main-site.vercel.app',
-  coffeeSite:  'https://kijij-coffee-site.vercel.app',
-  leatherSite: 'https://kijij-leather-site.vercel.app',
+  mainSite:    'https://kijij.com',
+  coffeeSite:  'https://kijijcoffee.com',
+  leatherSite: 'https://kijijleather.com',
 } as const;
 
 export const LOCAL_URLS = {

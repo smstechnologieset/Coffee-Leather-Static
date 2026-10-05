@@ -13,6 +13,10 @@
     "dev:coffee": "npm run dev --workspace=coffee-site",
     "dev:leather": "npm run dev --workspace=leather-site",
     "build:all": "npm run build --workspaces --if-present",
-    "lint:all": "npm run lint --workspaces --if-present"
+    "lint:all": "npm run lint --workspaces --if-present",
+    "bundle:main": "npm run build --workspace=main-site && node main-site/scripts/prepare-cpanel-prebuilt.js",
+    "bundle:coffee": "npm run build --workspace=coffee-site && node coffee-site/scripts/prepare-cpanel-prebuilt.js",
+    "bundle:leather": "npm run build --workspace=leather-site && node leather-site/scripts/prepare-cpanel-prebuilt.js",
+    "bundle:all": "npm run bundle:main && npm run bundle:coffee && npm run bundle:leather"
   }
 }

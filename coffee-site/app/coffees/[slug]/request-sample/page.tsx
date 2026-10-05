@@ -118,18 +118,6 @@ export default function RequestSamplePage() {
   const productId = params.slug as string;
 
   const [coffee, setCoffee] = useState<any>(() => getStoredProduct(productId) || COFFEES[productId] || null);
-
-  useEffect(() => {
-    const loaded = getStoredProduct(productId) || COFFEES[productId] || null;
-    if (loaded) {
-      setCoffee(loaded);
-      if (loaded.sampleTiers && loaded.sampleTiers.length > 0) {
-        setSelectedTier(loaded.sampleTiers[0]);
-        setFormData((prev) => ({ ...prev, sampleSize: loaded.sampleTiers[0].size }));
-      }
-    }
-  }, [productId]);
-
   const sampleTiers: SampleTier[] = coffee?.sampleTiers || DEFAULT_SAMPLE_TIERS;
   const [selectedTier, setSelectedTier] = useState<SampleTier>(sampleTiers[0]);
 
@@ -158,6 +146,17 @@ export default function RequestSamplePage() {
   const [error, setError] = useState('');
   const [showStripeModal, setShowStripeModal] = useState(false);
   const [paymentResult, setPaymentResult] = useState<{ transactionId: string; last4: string } | null>(null);
+
+  useEffect(() => {
+    const loaded = getStoredProduct(productId) || COFFEES[productId] || null;
+    if (loaded) {
+      setCoffee(loaded);
+      if (loaded.sampleTiers && loaded.sampleTiers.length > 0) {
+        setSelectedTier(loaded.sampleTiers[0]);
+        setFormData((prev) => ({ ...prev, sampleSize: loaded.sampleTiers[0].size }));
+      }
+    }
+  }, [productId]);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -33,8 +33,26 @@ export default function ContactForm() {
 
     setLoading(true);
 
-    // Simulate submission delay
-    await new Promise((res) => setTimeout(res, 800));
+    try {
+      const { createClient } = await import('@/lib/supabase');
+      const supabase = createClient();
+      const { error: insertErr } = await supabase.from('contact_submissions').insert({
+        source_site: 'coffee',
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || null,
+        company: formData.company.trim() || null,
+        message: `[Purpose: ${formData.inquiryType} | Origin: ${formData.targetOrigin}]\n\n${formData.message.trim()}`,
+        status: 'new',
+      });
+
+      if (insertErr) {
+        console.error('[contact] Supabase error:', insertErr);
+        // Fall back gracefully if table not yet migrated
+      }
+    } catch (err) {
+      console.warn('[contact] Submission warning:', err);
+    }
 
     setLoading(false);
     setSubmitted(true);

@@ -3,7 +3,10 @@
  *
  * Store for direct retail customer orders placed via "Order Now".
  * Manages customer order records, fulfillment statuses, and administrative actions.
+ * Integrates with Supabase 'orders' table (site_source = 'coffee') with localStorage caching.
  */
+
+import { createClient } from './supabase';
 
 export interface DirectOrder {
   id: string;               // e.g. "ord_1727538000"
@@ -26,7 +29,7 @@ export interface DirectOrder {
   };
   deliveryNotes?: string;
   status: 'Paid / Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-  paymentStatus: 'paid';
+  paymentStatus: 'paid' | 'pending' | 'failed' | 'refunded';
   stripeTransactionId: string;
   trackingNumber?: string;
   carrier?: string;
@@ -108,6 +111,69 @@ export function getDirectOrders(): DirectOrder[] {
   }
 }
 
+/** Asynchronously fetch live coffee orders from Supabase */
+export async function fetchDirectOrdersFromDb(): Promise<DirectOrder[]> {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('site_source', 'coffee')
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      return getDirectOrders();
+    }
+
+    const mapped: DirectOrder[] = data.map((row: any) => {
+      const firstItem = Array.isArray(row.items) && row.items.length > 0 ? row.items[0] : {};
+      const addr = row.shipping_address || {};
+
+      let statusMap: DirectOrder['status'] = 'Paid / Processing';
+      if (row.fulfillment_status === 'shipped') statusMap = 'Shipped';
+      else if (row.fulfillment_status === 'delivered') statusMap = 'Delivered';
+      else if (row.fulfillment_status === 'cancelled') statusMap = 'Cancelled';
+
+      return {
+        id: row.id,
+        productId: firstItem.product_id || 'coffee-lot',
+        productName: firstItem.product_name || 'Ethiopian Specialty Coffee',
+        quantity: Number(firstItem.quantity) || 1,
+        packageLabel: firstItem.package_label || 'Standard Pack',
+        unitPrice: Number(firstItem.unit_price) || Number(row.subtotal) || 28,
+        totalAmount: Number(row.total_amount) || 28,
+        customerName: row.customer_name || 'Customer',
+        customerEmail: row.customer_email || '',
+        customerPhone: row.customer_phone || '',
+        shippingAddress: {
+          street: addr.street || addr.line1 || 'Address on file',
+          city: addr.city || '',
+          state: addr.state || '',
+          country: addr.country || 'International',
+          postalCode: addr.postalCode || addr.postal_code || '',
+        },
+        deliveryNotes: row.delivery_notes || undefined,
+        status: statusMap,
+        paymentStatus: row.payment_status || 'paid',
+        stripeTransactionId: row.stripe_payment_intent_id || row.stripe_session_id || 'paid_verified',
+        carrier: row.carrier || undefined,
+        trackingNumber: row.tracking_number || undefined,
+        createdAt: row.created_at || new Date().toISOString(),
+      };
+    });
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped));
+      window.dispatchEvent(new Event('kijij_direct_orders_updated'));
+    }
+
+    return mapped;
+  } catch (err) {
+    console.warn('Failed to fetch orders from Supabase:', err);
+    return getDirectOrders();
+  }
+}
+
 export function saveDirectOrder(
   order: Omit<DirectOrder, 'id' | 'createdAt'> & { id?: string; createdAt?: string }
 ): DirectOrder {
@@ -126,6 +192,42 @@ export function saveDirectOrder(
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 
     window.dispatchEvent(new Event('kijij_direct_orders_updated'));
+
+    // Also persist to Supabase in background
+    try {
+      const supabase = createClient();
+      supabase
+        .from('orders')
+        .insert({
+          id: fullOrder.id,
+          order_number: `ORD-COF-${Date.now().toString().slice(-6).toUpperCase()}`,
+          site_source: 'coffee',
+          customer_name: fullOrder.customerName,
+          customer_email: fullOrder.customerEmail,
+          customer_phone: fullOrder.customerPhone,
+          shipping_address: fullOrder.shippingAddress,
+          items: [
+            {
+              product_id: fullOrder.productId,
+              product_name: fullOrder.productName,
+              quantity: fullOrder.quantity,
+              unit_price: fullOrder.unitPrice,
+              package_label: fullOrder.packageLabel,
+            },
+          ],
+          subtotal: fullOrder.totalAmount,
+          total_amount: fullOrder.totalAmount,
+          payment_status: fullOrder.paymentStatus,
+          fulfillment_status: fullOrder.status === 'Shipped' ? 'shipped' : 'processing',
+          stripe_payment_intent_id: fullOrder.stripeTransactionId,
+        })
+        .then(({ error }: any) => {
+          if (error) console.warn('Supabase order insert warning:', error.message);
+        });
+    } catch (dbErr) {
+      console.warn('Could not sync order to Supabase:', dbErr);
+    }
+
     return fullOrder;
   } catch (e) {
     console.error('Failed to save direct order', e);
@@ -160,6 +262,31 @@ export function updateDirectOrderStatus(
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     window.dispatchEvent(new Event('kijij_direct_orders_updated'));
+
+    // Sync status change to Supabase
+    try {
+      const supabase = createClient();
+      let dbFulfillment = 'processing';
+      if (status === 'Shipped') dbFulfillment = 'shipped';
+      else if (status === 'Delivered') dbFulfillment = 'delivered';
+      else if (status === 'Cancelled') dbFulfillment = 'cancelled';
+
+      supabase
+        .from('orders')
+        .update({
+          fulfillment_status: dbFulfillment,
+          tracking_number: trackingNumber || null,
+          carrier: carrier || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .then(({ error }: any) => {
+          if (error) console.warn('Supabase order status update error:', error.message);
+        });
+    } catch (dbErr) {
+      console.warn('Could not sync status update to Supabase:', dbErr);
+    }
+
     return updatedOrder;
   } catch (e) {
     console.error('Failed to update direct order status', e);

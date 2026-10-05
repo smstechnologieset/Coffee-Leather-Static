@@ -6,16 +6,26 @@ const ADMIN_EMAIL = 'admin@mixed.com';
 
 export default async function AccountPage() {
   const supabase = await createServerSupabaseClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect('/login');
   }
 
-  const user = session.user;
   const name = user.user_metadata?.full_name ?? user.email ?? '';
   const email = user.email ?? '';
-  const isAdmin = email === ADMIN_EMAIL;
+  let isAdmin = email.toLowerCase() === ADMIN_EMAIL;
+
+  // Check public.staff table in Supabase
+  const { data: staffMember } = await supabase
+    .from('staff')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (staffMember && (staffMember.role === 'admin' || staffMember.role === 'staff')) {
+    isAdmin = true;
+  }
 
   return (
     <AccountClient

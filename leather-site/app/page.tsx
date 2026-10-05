@@ -10,7 +10,7 @@ import WishlistButton from '@/components/WishlistButton';
 // ── Hero slides ───────────────────────────────────────────────────────────────
 const HERO_SLIDES = [
   {
-    image: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1920&q=90',
+    image: '/images/highland-weekender.jpg',
     tag: 'New Collection — 2026',
     headline: 'Timeless Craft.',
     headlineItalic: 'Ethiopian Heritage.',
@@ -347,10 +347,10 @@ export default function LeatherHomePage() {
         <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-[500px]">
           <div className="relative min-h-[300px] lg:min-h-0 overflow-hidden">
             <Image
-              src="https://images.unsplash.com/photo-1632170780799-d23fe3c3bfff?w=900&q=85"
+              src="/images/our-process.jpg"
               alt="Artisan crafting leather in Addis Ababa"
               fill
-              className="object-cover opacity-70"
+              className="object-cover opacity-80"
               unoptimized
             />
           </div>

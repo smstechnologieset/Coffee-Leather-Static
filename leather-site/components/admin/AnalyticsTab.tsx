@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, ShoppingBag, Tag, DollarSign } from 'lucide-react';
-import { getLeatherProducts, getLeatherOrders, LeatherOrder } from '@/lib/leather-data';
+import { getLeatherProducts, getLeatherOrders, fetchLeatherOrdersFromDb, LeatherOrder } from '@/lib/leather-data';
 
 const STATUS_COLOR: Record<string, string> = {
   pending:    '#F59E0B',
@@ -58,6 +58,9 @@ export default function AnalyticsTab() {
   useEffect(() => {
     setOrders(getLeatherOrders());
     setProducts(getLeatherProducts());
+    fetchLeatherOrdersFromDb().then((dbOrders) => {
+      if (dbOrders && dbOrders.length > 0) setOrders(dbOrders);
+    });
     const h = () => { setOrders(getLeatherOrders()); setProducts(getLeatherProducts()); };
     window.addEventListener('kijij_leather_orders_updated', h);
     window.addEventListener('kijij_leather_products_updated', h);

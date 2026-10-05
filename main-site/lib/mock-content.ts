@@ -231,7 +231,7 @@ export const GALLERY_IMAGES: GalleryItem[] = [
   },
   {
     id: 10,
-    src: "https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800&q=80",
+    src: "/images/highland-weekender.jpg",
     alt: "Handcrafted Leather Travel Goods — Weekender duffel bag in premium tanned leather",
     caption: "Supple, full-grain Ethiopian leather travel bags built for longevity",
     category: "leather",

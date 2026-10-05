@@ -310,18 +310,20 @@ export default function OrderNowProductsTab() {
                 <button
                   type="button"
                   onClick={() => openEdit(p)}
-                  className="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-700 transition"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 font-semibold text-xs border border-neutral-300 transition-all shadow-xs"
                   title="Edit product"
                 >
-                  <Edit2 className="h-3.5 w-3.5" />
+                  <Edit2 className="h-3.5 w-3.5 text-neutral-600" />
+                  <span>Edit</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(p.id, p.name)}
-                  className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-700 font-semibold text-xs border border-red-200 transition-all shadow-xs"
                   title="Delete product"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
+                  <span>Delete</span>
                 </button>
               </div>
             </div>

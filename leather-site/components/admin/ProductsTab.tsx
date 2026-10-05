@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Plus, Pencil, Trash2, Search, X, Check, Star,
-  ChevronDown, ChevronUp, Eye, EyeOff,
+  ChevronDown, ChevronUp, Eye, EyeOff, Upload, Image as ImageIcon,
 } from 'lucide-react';
 import {
   getLeatherProducts, saveLeatherProduct, deleteLeatherProduct,
@@ -178,6 +178,33 @@ export default function ProductsTab() {
     setFormField('images', images);
   };
 
+  const handleDeviceUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    Array.from(files).forEach((file) => {
+      if (file.size > 8 * 1024 * 1024) {
+        alert(`File ${file.name} is too large. Maximum size is 8MB.`);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (uploadEvent) => {
+        const dataUrl = uploadEvent.target?.result as string;
+        if (dataUrl) {
+          setForm((prev) => {
+            const filtered = prev.images.filter((img) => img.trim().length > 0);
+            return {
+              ...prev,
+              images: [...filtered, dataUrl],
+            };
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
   return (
     <div className="space-y-4">
       {/* Header bar */}
@@ -273,21 +300,23 @@ export default function ProductsTab() {
                       {p.isOnSale && <span className="text-[9px] font-bold uppercase bg-red-600 text-white px-1.5 py-0.5">Sale</span>}
                     </div>
                   </td>
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <td className="px-5 py-3 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={() => openEdit(p)}
-                        className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 transition-colors"
-                        title="Edit"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 font-semibold text-xs border border-neutral-300 transition-all shadow-xs"
+                        title="Edit Product"
                       >
-                        <Pencil className="h-3.5 w-3.5" />
+                        <Pencil className="h-3.5 w-3.5 text-neutral-600" />
+                        <span>Edit</span>
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(p.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-50 text-neutral-400 hover:text-red-600 transition-colors"
-                        title="Delete"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-700 font-semibold text-xs border border-red-200 transition-all shadow-xs"
+                        title="Delete Product"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
+                        <span>Delete</span>
                       </button>
                     </div>
                   </td>
@@ -516,35 +545,73 @@ export default function ProductsTab() {
               </div>
 
               {/* Images */}
-              <Field label="Images (URLs)">
-                <div className="space-y-2">
-                  {form.images.map((img, i) => (
-                    <div key={i} className="flex gap-2">
+              <Field label="Product Images">
+                <div className="space-y-3">
+                  {/* Upload action buttons */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 bg-neutral-900 text-white rounded-lg text-xs font-semibold hover:bg-neutral-800 transition shadow-xs">
+                      <Upload className="h-3.5 w-3.5" />
+                      <span>Upload from Device</span>
                       <input
-                        value={img}
-                        onChange={(e) => updateImage(i, e.target.value)}
-                        className={inputCls}
-                        placeholder="https://..."
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/jpg,image/avif"
+                        multiple
+                        onChange={handleDeviceUpload}
+                        className="hidden"
                       />
-                      {img && (
-                        <div className="relative w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-[#F2EDE8]">
-                          <Image src={img} alt="" fill className="object-cover" unoptimized />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setFormField('images', [...form.images, ''])}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-lg text-xs font-semibold border border-neutral-300 transition"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Add Image URL</span>
+                    </button>
+                    <span className="text-[11px] text-neutral-400">JPG, PNG, WebP up to 8MB</span>
+                  </div>
+
+                  {/* Previews / URL inputs */}
+                  <div className="space-y-2">
+                    {form.images.map((img, i) => (
+                      <div key={i} className="flex items-center gap-2 bg-neutral-50 p-2 rounded-xl border border-neutral-200">
+                        <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-neutral-200 border border-neutral-300">
+                          {img ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={img} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-neutral-400">
+                              <ImageIcon className="h-5 w-5" />
+                            </div>
+                          )}
+                          {i === 0 && (
+                            <span className="absolute bottom-0 inset-x-0 bg-neutral-900 text-white text-[8px] font-bold text-center py-0.5 uppercase tracking-wider">
+                              Cover
+                            </span>
+                          )}
                         </div>
-                      )}
-                      <button
-                        onClick={() => setFormField('images', form.images.filter((_, j) => j !== i))}
-                        className="p-2 text-neutral-400 hover:text-red-500"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => setFormField('images', [...form.images, ''])}
-                    className="text-xs text-neutral-500 hover:text-neutral-900 underline underline-offset-2"
-                  >
-                    + Add image URL
-                  </button>
+                        <input
+                          value={img}
+                          onChange={(e) => updateImage(i, e.target.value)}
+                          className="flex-1 bg-white border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900"
+                          placeholder="Paste image URL (https://...) or choose a file from device"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setFormField('images', form.images.filter((_, j) => j !== i))}
+                          className="p-2 text-neutral-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
+                          title="Remove image"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {form.images.length === 0 && (
+                      <div className="text-center py-6 border-2 border-dashed border-neutral-200 rounded-xl bg-neutral-50 text-neutral-400 text-xs">
+                        No images added yet. Click &quot;Upload from Device&quot; or &quot;Add Image URL&quot; above.
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Field>
 

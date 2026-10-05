@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Search, X, Package, Truck, Check, ChevronRight } from 'lucide-react';
 import {
-  getLeatherOrders, updateLeatherOrderStatus,
+  getLeatherOrders, updateLeatherOrderStatus, fetchLeatherOrdersFromDb,
   LeatherOrder, LeatherOrderStatus,
 } from '@/lib/leather-data';
 
@@ -31,6 +31,9 @@ export default function OrdersTab() {
 
   useEffect(() => {
     setOrders(getLeatherOrders());
+    fetchLeatherOrdersFromDb().then((dbOrders) => {
+      if (dbOrders && dbOrders.length > 0) setOrders(dbOrders);
+    });
     const h = () => setOrders(getLeatherOrders());
     window.addEventListener('kijij_leather_orders_updated', h);
     return () => window.removeEventListener('kijij_leather_orders_updated', h);
@@ -179,8 +182,14 @@ export default function OrdersTab() {
                       <td className="px-5 py-3 text-xs text-neutral-400 whitespace-nowrap">
                         {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
                       </td>
-                      <td className="px-5 py-3">
-                        <ChevronRight className="h-4 w-4 text-neutral-300" />
+                      <td className="px-5 py-3 text-right whitespace-nowrap">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setSelected(order); }}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 font-semibold text-xs border border-neutral-300 transition-all shadow-xs"
+                        >
+                          <span>Details</span>
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </button>
                       </td>
                     </tr>
                   ))}

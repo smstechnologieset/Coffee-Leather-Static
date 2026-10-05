@@ -373,20 +373,22 @@ export default function ProductsSection() {
                       <td className="py-3 font-mono font-bold text-primary-700">
                         ${p.pricePerQuintal}/Quintal <span className="text-xs text-neutral-400 font-normal">(${(p.pricePerQuintal / 100).toFixed(2)}/kg)</span>
                       </td>
-                      <td className="py-3 text-right">
+                      <td className="py-3 text-right whitespace-nowrap">
                         <button
                           onClick={() => openEditProduct(p)}
-                          className="text-neutral-400 hover:text-primary-600 p-1 mr-1 transition-colors"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 font-semibold text-xs border border-neutral-300 transition-all shadow-xs mr-2"
                           title="Edit Product"
                         >
-                          <Edit2 className="h-4 w-4 inline" />
+                          <Edit2 className="h-3.5 w-3.5 text-neutral-600" />
+                          <span>Edit</span>
                         </button>
                         <button
                           onClick={() => handleDeleteProduct(p.id)}
-                          className="text-neutral-400 hover:text-red-500 p-1 transition-colors"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-700 font-semibold text-xs border border-red-200 transition-all shadow-xs"
                           title="Delete Product"
                         >
-                          <Trash2 className="h-4 w-4 inline" />
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span>Delete</span>
                         </button>
                       </td>
                     </tr>
@@ -507,20 +509,22 @@ export default function ProductsSection() {
                         {product.availability || 'In Stock'}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-right">
+                    <td className="px-5 py-4 text-right whitespace-nowrap">
                       <button
                         onClick={() => openEditProduct(product)}
-                        className="text-neutral-400 hover:text-primary-600 p-1 mr-1 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-900 hover:text-white text-neutral-800 font-semibold text-xs border border-neutral-300 transition-all shadow-xs mr-2"
                         title="Edit product"
                       >
-                        <Edit2 className="h-4 w-4 inline" />
+                        <Edit2 className="h-3.5 w-3.5 text-neutral-600" />
+                        <span>Edit</span>
                       </button>
                       <button
                         onClick={() => handleDeleteProduct(product.id)}
-                        className="text-neutral-400 hover:text-red-500 p-1 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-700 font-semibold text-xs border border-red-200 transition-all shadow-xs"
                         title="Delete product"
                       >
-                        <Trash2 className="h-4 w-4 inline" />
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Delete</span>
                       </button>
                     </td>
                   </tr>

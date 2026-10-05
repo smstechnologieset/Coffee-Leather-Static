@@ -102,17 +102,6 @@ export default function RequestContractPage() {
 
   const [coffee, setCoffee] = useState<any>(() => getStoredProduct(productId) || COFFEES[productId] || null);
 
-  useEffect(() => {
-    const loaded = getStoredProduct(productId) || COFFEES[productId] || null;
-    if (loaded) {
-      setCoffee(loaded);
-      setFormData((prev) => ({
-        ...prev,
-        quantity: loaded.minOrderQuintals || prev.quantity || 10,
-      }));
-    }
-  }, [productId]);
-
   const [user, setUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
@@ -140,6 +129,17 @@ export default function RequestContractPage() {
   const [showStripeModal, setShowStripeModal] = useState(false);
   const [paymentResult, setPaymentResult] = useState<{ transactionId: string; last4: string } | null>(null);
   const [paymentOption, setPaymentOption] = useState<'deposit' | 'full'>('deposit');
+
+  useEffect(() => {
+    const loaded = getStoredProduct(productId) || COFFEES[productId] || null;
+    if (loaded) {
+      setCoffee(loaded);
+      setFormData((prev) => ({
+        ...prev,
+        quantity: loaded.minOrderQuintals || prev.quantity || 10,
+      }));
+    }
+  }, [productId]);
 
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
