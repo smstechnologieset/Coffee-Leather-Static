@@ -1,8 +1,14 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Shirt, ArrowRight } from 'lucide-react';
 import { SITE_CONFIG } from '@highland/shared/site-config';
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/admin')) return null;
+
   const footerLinks = {
     Shop: [
       { name: 'All Products', href: '/products' },

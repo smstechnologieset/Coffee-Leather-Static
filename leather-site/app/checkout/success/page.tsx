@@ -238,7 +238,7 @@ function SuccessContent() {
 
 export default function OrderSuccessPage() {
   return (
-    <main className="min-h-screen pt-28 pb-20 bg-neutral-50">
+    <main className="min-h-screen pt-10 sm:pt-14 pb-20 bg-neutral-50">
       <Suspense
         fallback={
           <div className="min-h-[60vh] flex items-center justify-center">

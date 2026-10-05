@@ -123,7 +123,7 @@ export default function LoginPage() {
               <Shirt className="h-6 w-6 text-white" />
             </div>
             <div>
-              <p className="text-white font-bold text-lg leading-none">Highland Roots</p>
+              <p className="text-white font-bold text-lg leading-none">KIJIJ</p>
               <p className="text-neutral-300 text-xs uppercase tracking-widest mt-1">Leather Goods</p>
             </div>
           </div>

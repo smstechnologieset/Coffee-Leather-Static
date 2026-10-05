@@ -156,22 +156,29 @@ export default function Header() {
     menuTimeout.current = setTimeout(() => setActiveMenu(null), 150);
   };
 
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   const headerBg = scrolled ? 'bg-white shadow-[0_1px_0_0_#E5E7EB]' : 'bg-white';
 
   return (
     <>
       {/* ── Announcement bar ── */}
       {announcement && (
-        <div className="bg-neutral-900 text-neutral-200 text-[11px] tracking-widest uppercase text-center py-2 px-4 font-medium">
-          {announcement}
-        </div>
+        <aside
+          aria-label="Announcement"
+          className="bg-neutral-950 text-neutral-300 text-[10px] sm:text-[11px] font-medium tracking-[0.2em] uppercase text-center py-1.5 px-4 flex items-center justify-center border-b border-neutral-900/60 leading-normal"
+        >
+          <span>{announcement}</span>
+        </aside>
       )}
 
       <header className={`sticky top-0 inset-x-0 z-40 transition-shadow duration-200 ${headerBg}`}>
 
         {/* ── Main header row — 3-col grid keeps logo always centred ── */}
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center h-[60px] lg:h-[68px]">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center h-[54px] lg:h-[62px]">
 
             {/* Col 1: Desktop nav | Mobile: empty (hamburger is in col 3) */}
             <nav className="hidden lg:flex items-center gap-5 xl:gap-7">
